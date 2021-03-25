@@ -1,15 +1,17 @@
 <script lang="typescript">
+    import { Button, Illustration, OnboardingLayout, Text } from 'shared/components'
     import { createEventDispatcher } from 'svelte'
-    import { OnboardingLayout, Illustration, Text, Button } from 'shared/components'
-    export let locale
-    export let mobile
+    import type { MessageFormatter } from 'shared/lib/i18n'
+
+    export let locale: MessageFormatter
+    export let mobile: boolean
 
     const dispatch = createEventDispatcher()
 
-    function handleContinueClick(type) {
+    const handleContinueClick = (type: string) => {
         dispatch('next', { type })
     }
-    function handleBackClick() {
+    const handleBackClick = () => {
         dispatch('previous')
     }
 </script>

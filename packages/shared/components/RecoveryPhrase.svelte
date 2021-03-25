@@ -1,5 +1,5 @@
 <script lang="typescript">
-    export let recoveryPhrase = []
+    export let recoveryPhrase: string[] = []
     export let verifyRecoveryPhrase = undefined
 
     export let hide = false

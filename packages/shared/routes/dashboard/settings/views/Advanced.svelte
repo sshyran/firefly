@@ -8,9 +8,10 @@
     import { activeProfile, updateProfile } from 'shared/lib/profile'
     import type { ClientOptions, Node } from 'shared/lib/typings/client'
     import { api, isSyncing, syncAccounts, wallet, WalletAccount } from 'shared/lib/wallet'
+    import type { MessageFormatter } from 'shared/lib/i18n'
     import { get } from 'svelte/store'
 
-    export let locale
+    export let locale: MessageFormatter
 
     const { accounts } = $wallet
 
@@ -183,14 +184,16 @@
                     items={[...DEFAULT_NODES, ...$activeProfile?.settings.customNodes].map((node) => ({
                         value: node.url,
                         label: node.url,
-                    }))} />
+                    }))}
+                />
                 <!-- As client options (nodes) have association with accounts, disable "Add node" button if there are no accounts in wallet -->
                 <Button
                     medium
                     inlineStyle="min-width: 156px;"
                     classes="w-1/4 mt-4"
                     disabled={!$accounts.length}
-                    onClick={() => handleAddNodeClick()}>
+                    onClick={() => handleAddNodeClick()}
+                >
                     {locale('actions.addNode')}
                 </Button>
                 <Button
@@ -198,7 +201,8 @@
                     inlineStyle="min-width: 156px;"
                     classes="w-1/2 mt-4"
                     onClick={() => handleRemoveNodeClick()}
-                    disabled={!$activeProfile?.settings.customNodes.find((n) => n.url === $activeProfile?.settings.node?.url)}>
+                    disabled={!$activeProfile?.settings.customNodes.find((n) => n.url === $activeProfile?.settings.node?.url)}
+                >
                     {locale('actions.removeNode')}
                 </Button>
             </section>

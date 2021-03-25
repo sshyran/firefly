@@ -1,8 +1,9 @@
 <script lang="typescript">
-    import { Electron } from 'shared/lib/electron'
     import { Button, HR, Text } from 'shared/components'
+    import { Electron } from 'shared/lib/electron'
+    import type { MessageFormatter } from 'shared/lib/i18n'
 
-    export let locale
+    export let locale: MessageFormatter
 
     const handleTroubleshootClick = () => {
         Electron.openUrl('https://iota.org')

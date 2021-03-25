@@ -1,14 +1,16 @@
 <script lang="typescript">
-    import { Button, Text } from 'shared/components'
-    import { logout } from 'shared/lib/app'
-    import { Electron } from 'shared/lib/electron'
-    import { showAppNotification } from 'shared/lib/notifications'
-    import { closePopup } from 'shared/lib/popup'
-    import { activeProfile, removeProfile } from 'shared/lib/profile'
-    import { api } from 'shared/lib/wallet'
-    import { get } from 'svelte/store'
+    import { Button,Text } from 'shared/components';
+    import { logout } from 'shared/lib/app';
+    import { Electron } from 'shared/lib/electron';
+    import { showAppNotification } from 'shared/lib/notifications';
+    import { closePopup } from 'shared/lib/popup';
+    import { activeProfile,removeProfile } from 'shared/lib/profile';
+    import { api } from 'shared/lib/wallet';
+    import type { MessageFormatter } from 'shared/lib/i18n';
+    import { get } from 'svelte/store';
 
-    export let locale
+
+    export let locale: MessageFormatter
 
     let isBusy = false
 

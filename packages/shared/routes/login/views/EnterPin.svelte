@@ -1,20 +1,21 @@
 <script lang="typescript">
     import { Button, Icon, Pin, Profile, Text } from 'shared/components'
     import { Electron } from 'shared/lib/electron'
+    import type { MessageFormatter } from 'shared/lib/i18n'
     import { showAppNotification } from 'shared/lib/notifications'
     import { activeProfile } from 'shared/lib/profile'
     import { validatePinFormat } from 'shared/lib/utils'
-    import { api, getStoragePath, initialise } from 'shared/lib/wallet'
+    import { asyncSetStrongholdPassword, getStoragePath, initialise } from 'shared/lib/wallet'
     import { createEventDispatcher, onDestroy } from 'svelte'
     import { get } from 'svelte/store'
 
-    export let locale
-    export let mobile
+    export let locale: MessageFormatter
+    export let mobile: boolean
 
     let attempts = 0
     let pinCode = ''
     let isBusy = false
-    let pinRef
+    let pinRef: Pin
 
     /** Maximum number of consecutive (incorrect) attempts allowed to the user */
     const MAX_PINCODE_INCORRECT_ATTEMPTS = 3
@@ -29,7 +30,7 @@
 
     let buttonText = setButtonText(timeRemainingBeforeNextAttempt)
 
-    function setButtonText(time) {
+    function setButtonText(time: number) {
         return locale('views.login.pleaseWait', { values: { time: time.toString() } })
     }
 
@@ -53,45 +54,40 @@
         }
     }
 
-    function onSubmit() {
+    async function onSubmit() {
         if (!hasReachedMaxAttempts) {
             const profile = get(activeProfile)
 
             isBusy = true
 
-            Electron.PincodeManager.verify(profile.id, pinCode)
-                .then((verified) => {
-                    if (verified === true) {
-                        return Electron.getUserDataPath().then((path) => {
-                            initialise(profile.id, getStoragePath(path, profile.name))
-                            api.setStoragePassword(pinCode, {
-                                onSuccess() {
-                                    dispatch('next')
-                                },
-                                onError(err) {
-                                    isBusy = false
-                                    showAppNotification({
-                                        type: 'error',
-                                        message: locale(err.error),
-                                    })
-                                },
-                            })
-                        })
-                    } else {
-                        isBusy = false
-                        attempts++
-                        if (attempts >= MAX_PINCODE_INCORRECT_ATTEMPTS) {
-                            clearInterval(timerId)
-                            timerId = setInterval(countdown, 1000)
-                        } else {
-                            pinRef.resetAndFocus()
-                        }
-                    }
-                })
-                .catch((error) => {
-                    console.error(error)
+            try {
+                const verified = await Electron.PincodeManager.verify(profile.id, pinCode)
+
+                if (verified === true) {
+                    const userDataPath = await Electron.getUserDataPath()
+                    initialise(profile.id, getStoragePath(userDataPath, profile.name))
+
+                    await asyncSetStrongholdPassword(pinCode)
+
+                    dispatch('next')
+                } else {
                     isBusy = false
+                    attempts++
+                    if (attempts >= MAX_PINCODE_INCORRECT_ATTEMPTS) {
+                        clearInterval(timerId)
+                        timerId = setInterval(countdown, 1000)
+                    } else {
+                        pinRef.resetAndFocus()
+                    }
+                }
+            } catch (err) {
+                showAppNotification({
+                    type: 'error',
+                    message: locale(err.error),
                 })
+            } finally {
+                isBusy = false
+            }
         }
     }
 
@@ -114,7 +110,8 @@
             data-label="back-button"
             class="absolute top-12 left-5 disabled:opacity-50 cursor-pointer disabled:cursor-auto"
             disabled={hasReachedMaxAttempts}
-            on:click={handleBackClick}>
+            on:click={handleBackClick}
+        >
             <div class="flex items-center space-x-3">
                 <Icon icon="arrow-left" classes="text-blue-500" />
                 <Text type="h5">{locale('general.profiles')}</Text>
@@ -129,11 +126,14 @@
                     classes="mt-10"
                     on:submit={onSubmit}
                     disabled={hasReachedMaxAttempts || isBusy}
-                    autofocus />
+                    autofocus
+                />
                 <Text type="p" bold classes="mt-4 text-center">
-                    {attempts > 0 ? locale('views.login.incorrectAttempts', {
+                    {attempts > 0
+                        ? locale('views.login.incorrectAttempts', {
                               values: { attempts: attempts.toString() },
-                          }) : locale('actions.enterYourPin')}
+                          })
+                        : locale('actions.enterYourPin')}
                 </Text>
             </div>
             <Button classes="w-96" disabled={!hasCorrectFormat || hasReachedMaxAttempts || isBusy} onClick={() => onSubmit()}>

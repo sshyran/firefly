@@ -7,10 +7,11 @@
     import { AccountRoutes, SettingsRoutes, Tabs, WalletRoutes } from 'shared/lib/typings/routes'
     import { selectedAccountId } from 'shared/lib/wallet'
     import { onDestroy } from 'svelte'
+    import type { MessageFormatter } from 'shared/lib/i18n'
     import { SettingsHome, SettingsViewer } from './views'
 
-    export let locale
-    export let mobile
+    export let locale: MessageFormatter
+    export let mobile: boolean
     export let handleClose
 
     $: {
@@ -38,7 +39,9 @@
 </script>
 
 <div
-    class="relative w-full h-full px-16 py-12 flex flex-1 bg-white dark:bg-gray-900 {$settingsRoute !== SettingsRoutes.Init && 'pt-20'} ">
+    class="relative w-full h-full px-16 py-12 flex flex-1 bg-white dark:bg-gray-900 {$settingsRoute !== SettingsRoutes.Init &&
+        'pt-20'} "
+>
     <button on:click={handleClose || closeSettings} class="absolute top-8 right-8">
         <Icon icon="close" classes="text-gray-800 dark:text-white" />
     </button>

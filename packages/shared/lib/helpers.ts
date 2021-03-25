@@ -34,7 +34,7 @@ export const persistent = <T>(key: string, initialValue: T): Writable<T> => {
 /**
  * Extract initials from string
  */
-export const getInitials = (name: string | undefined, maxChars: number) => {
+export const getInitials = (name: string | undefined, maxChars?: number) => {
     if (!name) {
         return ""
     }

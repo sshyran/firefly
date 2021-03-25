@@ -1,13 +1,14 @@
 <script lang="typescript">
-    import { showAppNotification } from 'shared/lib/notifications'
     import { Button, Illustration, OnboardingLayout, Password, Text } from 'shared/components'
+    import { showAppNotification } from 'shared/lib/notifications'
     import passwordInfo from 'shared/lib/password'
     import { asyncSetStrongholdPassword, MAX_PASSWORD_LENGTH } from 'shared/lib/wallet'
     import { createEventDispatcher } from 'svelte'
+    import type { MessageFormatter } from 'shared/lib/i18n'
     import zxcvbn from 'zxcvbn'
 
-    export let locale
-    export let mobile
+    export let locale: MessageFormatter
+    export let mobile: boolean
 
     let password = ''
     let confirmedPassword = ''
@@ -71,14 +72,16 @@
                     strength={passwordStrength.score}
                     {locale}
                     autofocus
-                    disabled={busy} />
+                    disabled={busy}
+                />
                 <Password
                     bind:value={confirmedPassword}
                     classes="mb-5"
                     {locale}
                     placeholder={locale('general.confirmPassword')}
                     showRevealToggle
-                    disabled={busy} />
+                    disabled={busy}
+                />
             </form>
         </div>
         <div slot="leftpane__action">

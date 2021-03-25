@@ -8,10 +8,11 @@
     import { SetupType } from 'shared/lib/typings/routes'
     import { getStoragePath, initialise, MAX_PROFILE_NAME_LENGTH } from 'shared/lib/wallet'
     import { createEventDispatcher } from 'svelte'
+    import type { MessageFormatter } from 'shared/lib/i18n'
     import { get } from 'svelte/store'
 
-    export let locale
-    export let mobile
+    export let locale: MessageFormatter
+    export let mobile: boolean
     let error = ''
     let busy = false
 
@@ -23,9 +24,8 @@
 
     $: isProfileNameValid = profileName && !hasOnlyWhitespaces(profileName)
 
-    async function handleContinueClick(setupType) {
+    const handleContinueClick = async (setupType: SetupType) => {
         if (profileName) {
-            let profile
             error = ''
 
             if (profileName.length > MAX_PROFILE_NAME_LENGTH) {
@@ -40,12 +40,12 @@
                 return (error = locale('error.profile.duplicate'))
             }
 
-            profile = createProfile(profileName, isDeveloperProfile)
+            const profile = createProfile(profileName, isDeveloperProfile)
 
             try {
                 busy = true
                 const userDataPath = await Electron.getUserDataPath()
-                initialise($newProfile.id, getStoragePath(userDataPath, $newProfile.name))
+                initialise(profile.id, getStoragePath(userDataPath, profile.name))
 
                 dispatch('next', { setupType })
             } catch (err) {
@@ -59,7 +59,7 @@
         }
     }
 
-    function handleBackClick() {
+    const handleBackClick = () => {
         cleanupSignup()
         disposeNewProfile()
         dispatch('previous')
@@ -81,7 +81,8 @@
                 classes="w-full"
                 autofocus
                 disabled={busy}
-                submitHandler={() => handleContinueClick(SetupType.New)} />
+                submitHandler={() => handleContinueClick(SetupType.New)}
+            />
             {#if $developerMode}
                 <ButtonCheckbox icon="dev" bind:value={isDeveloperProfile}>{locale('general.developerProfile')}</ButtonCheckbox>
             {/if}
@@ -91,7 +92,8 @@
                 secondary
                 classes="flex-1 mb-4"
                 disabled={!isProfileNameValid || busy}
-                onClick={() => handleContinueClick(SetupType.Import)}>
+                onClick={() => handleContinueClick(SetupType.Import)}
+            >
                 {locale('actions.importWallet')}
             </Button>
             <Button classes="flex-1" disabled={!isProfileNameValid || busy} onClick={() => handleContinueClick(SetupType.New)}>

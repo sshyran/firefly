@@ -1,9 +1,14 @@
 {
     "extends": "@tsconfig/svelte/tsconfig.json",
     "compilerOptions": {
-        "outDir": "lib/out",
-        "baseUrl": "./"
+        "outDir": "out",
+        "baseUrl": "./",
+        "paths": {
+            "shared/*": [
+                "./*"
+            ]
+        }
     },
-    "include": ["./lib"],
-    "exclude": ["lib/out"]
+    "include": ["./components", "./lib", "./routes"],
+    "exclude": ["out"]
 }

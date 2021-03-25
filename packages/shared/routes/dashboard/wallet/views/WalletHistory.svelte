@@ -4,15 +4,16 @@
     import { AccountRoutes, WalletRoutes } from 'shared/lib/typings/routes'
     import { AccountMessage, isSyncing, selectedAccountId, selectedMessage, syncAccounts, WalletAccount } from 'shared/lib/wallet'
     import { getContext } from 'svelte'
+    import type { MessageFormatter } from 'shared/lib/i18n'
     import type { Readable, Writable } from 'svelte/store'
     import { get } from 'svelte/store'
 
-    export let locale
+    export let locale: MessageFormatter
 
     const accounts = getContext<Writable<WalletAccount[]>>('walletAccounts')
     const transactions = getContext<Readable<AccountMessage[]>>('walletTransactions')
 
-    function handleTransactionClick(transaction) {
+    function handleTransactionClick(transaction: AccountMessage) {
         const sourceAccount = get(accounts).find((acc) => acc.index === transaction.account)
         if (sourceAccount) {
             selectedAccountId.set(sourceAccount.id)
@@ -38,7 +39,8 @@
                 <ActivityRow
                     {...transaction}
                     onClick={() => handleTransactionClick(transaction)}
-                    color={$accounts.find((acc) => acc.index === transaction.account)?.color} />
+                    color={$accounts.find((acc) => acc.index === transaction.account)?.color}
+                />
             {/each}
         {:else}
             <div class="h-full flex flex-col items-center justify-center text-center">

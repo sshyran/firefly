@@ -7,14 +7,13 @@
     import { createEventDispatcher } from 'svelte'
     import { get } from 'svelte/store'
     import { Pin, Protect } from './views/'
-    import { showAppNotification } from 'shared/lib/notifications'
     import { walletSetupType } from 'shared/lib/router'
     import { mnemonic } from 'shared/lib/app'
     import { DEFAULT_NODE, DEFAULT_NODES, network } from 'shared/lib/network'
     import { SetupType } from 'shared/lib/typings/routes'
 
-    export let locale
-    export let mobile
+    export let locale: MessageFormatter
+    export let mobile: boolean
 
     let busy = false
 

@@ -1,10 +1,11 @@
 <script lang="typescript">
-    import { Button, ButtonRadio, Icon, Illustration, OnboardingLayout, Radio, Text } from 'shared/components'
+    import { Button, ButtonRadio, Illustration, OnboardingLayout, Text } from 'shared/components'
     import { appSettings } from 'shared/lib/appSettings'
     import { createEventDispatcher } from 'svelte'
+    import type { MessageFormatter } from 'shared/lib/i18n'
 
-    export let locale
-    export let mobile
+    export let locale: MessageFormatter
+    export let mobile: boolean
 
     let darkModeEnabled = $appSettings.darkMode
 

@@ -1,10 +1,12 @@
 <script lang="typescript">
+    import { Button, Icon, Illustration, OnboardingLayout, Text } from 'shared/components'
+    import type { MessageFormatter } from 'shared/lib/i18n'
     import { createEventDispatcher } from 'svelte'
-    import { OnboardingLayout, Text, Button, Icon, Illustration } from 'shared/components'
+    import { ImportType } from '../import'
 
-    export let locale
-    export let mobile
-    export let importType
+    export let locale: MessageFormatter
+    export let mobile: boolean
+    export let importType: string
 
     const dispatch = createEventDispatcher()
 
@@ -35,9 +37,12 @@
         <!-- TODO: missing illustration -->
         <div slot="rightpane" class="w-full h-full flex justify-center bg-pastel-green dark:bg-gray-900">
             <Illustration
-                illustration={importType === 'seed' || importType === 'mnemonic' ? 'import-from-text-success-desktop' : 'import-from-file-success-desktop'}
+                illustration={importType === ImportType.Seed || importType === ImportType.Mnemonic
+                    ? 'import-from-text-success-desktop'
+                    : 'import-from-file-success-desktop'}
                 width="100%"
-                height="auto" />
+                height="auto"
+            />
         </div>
     </OnboardingLayout>
 {/if}

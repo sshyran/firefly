@@ -1,9 +1,9 @@
 <script lang="typescript">
     import { Icon } from 'shared/components'
 
-    export let allowBack = true
-    export let onBackClick = () => {}
-    export let busy = false
+    export let allowBack: boolean = true
+    export let onBackClick: () => void
+    export let busy: boolean = false
 </script>
 
 <!-- https://github.com/sveltejs/svelte/issues/4546 -->

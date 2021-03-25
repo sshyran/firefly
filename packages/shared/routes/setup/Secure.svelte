@@ -2,9 +2,10 @@
     import { Button, Illustration, OnboardingLayout, Text } from 'shared/components'
     import { downloadRecoveryKit } from 'shared/lib/utils'
     import { createEventDispatcher } from 'svelte'
+    import type { MessageFormatter } from 'shared/lib/i18n'
 
-    export let locale
-    export let mobile
+    export let locale: MessageFormatter
+    export let mobile: boolean
 
     const dispatch = createEventDispatcher()
 

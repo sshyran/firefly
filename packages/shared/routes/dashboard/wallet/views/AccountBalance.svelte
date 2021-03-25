@@ -1,7 +1,8 @@
 <script lang="typescript">
     import { Text } from 'shared/components'
+    import type { MessageFormatter } from 'shared/lib/i18n'
 
-    export let locale
+    export let locale: MessageFormatter
     export let color
     export let balance
     export let balanceEquiv
@@ -17,7 +18,8 @@
     </div>
     <button
         on:click={() => onMenuClick()}
-        class="px-2 py-3 flex flex-row space-x-1 bg-opacity-10 bg-black rounded-lg text-white absolute top-4 right-4">
+        class="px-2 py-3 flex flex-row space-x-1 bg-opacity-10 bg-black rounded-lg text-white absolute top-4 right-4"
+    >
         {#each Array(3) as _}
             <svg width="4" height="4" viewBox="0 0 4 4">
                 <circle cx="2" cy="2" r="2" class="fill-current" />

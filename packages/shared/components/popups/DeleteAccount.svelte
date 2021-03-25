@@ -6,8 +6,9 @@
     import { accountRoute, walletRoute } from 'shared/lib/router'
     import { AccountRoutes, WalletRoutes } from 'shared/lib/typings/routes'
     import { api, selectedAccountId } from 'shared/lib/wallet'
+    import type { MessageFormatter } from 'shared/lib/i18n'
 
-    export let locale
+    export let locale: MessageFormatter
     export let account
     export let deleteAccount = (selectedAccountId) => {}
     export let hasMultipleAccounts
@@ -87,7 +88,8 @@
                 placeholder={locale('general.password')}
                 autofocus
                 submitHandler={() => handleDeleteClick()}
-                disabled={isBusy} />
+                disabled={isBusy}
+            />
         {:else}
             <Text type="p" secondary classes="mb-5">{locale('popups.deleteAccount.errorBody3')}</Text>
         {/if}

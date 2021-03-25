@@ -1,6 +1,7 @@
 <script lang="typescript">
     import { AccountTile, Button, Text } from 'shared/components'
     import { loggedIn } from 'shared/lib/app'
+    import type { MessageFormatter } from 'shared/lib/i18n'
     import { closePopup, openPopup } from 'shared/lib/popup'
     import { accountRoute, walletRoute } from 'shared/lib/router'
     import { AccountRoutes, WalletRoutes } from 'shared/lib/typings/routes'
@@ -9,16 +10,16 @@
     import type { Writable } from 'svelte/store'
     import { Receive, Send } from '.'
 
-    export let locale
-    export let send
-    export let internalTransfer
-    export let generateAddress
-    export let isGeneratingAddress
+    export let locale: MessageFormatter
+    export let send: (senderAccountId: string, receiveAddress: string, amount: number) => void
+    export let internalTransfer: (senderAccountId: string, receiverAccountId: string, amount: number) => void
+    export let generateAddress: (accountId: string) => void
+    export let isGeneratingAddress: boolean
 
     const accounts = getContext<Writable<WalletAccount[]>>('walletAccounts')
     const accountsLoaded = getContext<Writable<boolean>>('walletAccountsLoaded')
 
-    let startInit
+    let startInit: number
 
     if ($walletRoute === WalletRoutes.Init && !$accountsLoaded && $loggedIn) {
         startInit = Date.now()
@@ -41,18 +42,18 @@
         }
     }
 
-    function handleAccountClick(accountId) {
+    const handleAccountClick = (accountId: string) => {
         selectedAccountId.set(accountId)
         walletRoute.set(WalletRoutes.Account)
         accountRoute.set(AccountRoutes.Init)
     }
-    function handleCreateClick() {
+    const handleCreateClick = () => {
         walletRoute.set(WalletRoutes.CreateAccount)
     }
-    function handleSendClick() {
+    const handleSendClick = () => {
         walletRoute.set(WalletRoutes.Send)
     }
-    function handleReceiveClick() {
+    const handleReceiveClick = () => {
         walletRoute.set(WalletRoutes.Receive)
     }
 </script>
@@ -66,7 +67,10 @@
             </div>
             {#if $accounts.length > 0}
                 <div
-                    class="grid grid-cols-{$accounts.length <= 2 ? $accounts.length : '3'} auto-rows-max {$accounts.length <= 2 ? 'gap-4' : 'gap-2.5'} w-full flex-auto overflow-y-auto h-1 -mr-2 pr-2">
+                    class="grid grid-cols-{$accounts.length <= 2 ? $accounts.length : '3'} auto-rows-max {$accounts.length <= 2
+                        ? 'gap-4'
+                        : 'gap-2.5'} w-full flex-auto overflow-y-auto h-1 -mr-2 pr-2"
+                >
                     {#each $accounts as account}
                         <AccountTile
                             color={account.color}
@@ -74,7 +78,8 @@
                             balance={account.balance}
                             balanceEquiv={account.balanceEquiv}
                             size={$accounts.length >= 3 ? 's' : $accounts.length === 2 ? 'm' : 'l'}
-                            onClick={() => handleAccountClick(account.id)} />
+                            onClick={() => handleAccountClick(account.id)}
+                        />
                     {/each}
                 </div>
             {:else}

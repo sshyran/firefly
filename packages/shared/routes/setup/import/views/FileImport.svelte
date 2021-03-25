@@ -1,15 +1,17 @@
 <script lang="typescript">
+    import { Button, Dropzone, Illustration, OnboardingLayout, Text } from 'shared/components'
+    import type { MessageFormatter } from 'shared/lib/i18n'
     import { createEventDispatcher } from 'svelte'
-    import { OnboardingLayout, Illustration, Text, Dropzone, Button } from 'shared/components'
+    import { isSeedVaultFile, SEEDVAULT_EXTENSION, STRONGHOLD_EXTENSION } from '../import'
 
-    export let locale
-    export let mobile
-    let file
-    let fileName
-    let filePath
+    export let locale: MessageFormatter
+    export let mobile: boolean
+    let file: ArrayBuffer | undefined
+    let fileName: string | undefined
+    let filePath: string | undefined
 
     // TODO: remove this to enable seed support
-    $: isSeedVault = fileName && fileName.endsWith('.kdbx')
+    $: isSeedVault = isSeedVaultFile(fileName)
 
     const dispatch = createEventDispatcher()
 
@@ -20,7 +22,7 @@
         dispatch('previous')
     }
 
-    const onDrop = (buffer, name, path) => {
+    const onDrop = (buffer: ArrayBuffer, name: string, path: string) => {
         if (!buffer) {
             file = null
             fileName = null
@@ -45,7 +47,8 @@
                 {onDrop}
                 {locale}
                 extentionsLabel={locale('actions.importExtentions')}
-                allowedExtensions={['kdbx', 'stronghold']} />
+                allowedExtensions={[SEEDVAULT_EXTENSION, STRONGHOLD_EXTENSION]}
+            />
             {#if isSeedVault}
                 <!-- TODO: remove this when enabling seed support -->
                 <Text type="p" error secondary classes="mt-4">Seed Vaults are not currently supported.</Text>

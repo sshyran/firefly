@@ -1,20 +1,12 @@
 <script lang="typescript">
+    import { Button, Checkbox, OnboardingLayout, Text } from 'shared/components'
     import { createEventDispatcher } from 'svelte'
-    import { OnboardingLayout, Text, Button, Scroller, Checkbox } from 'shared/components'
-    export let locale
-    export let mobile
+    import type { MessageFormatter } from 'shared/lib/i18n'
 
-    let checked = false
-    let progress = 0
+    export let locale: MessageFormatter
+    export let mobile: boolean
+
     let termsAccepted = false
-
-    let scroller
-    let index
-
-    let privacyPolicy
-    let termsOfService
-
-    $: termsAccepted = checked
 
     const dispatch = createEventDispatcher()
 
@@ -26,12 +18,6 @@
     }
 </script>
 
-<style type="text/scss">
-    [slot='rightpane'] section {
-        scroll-margin: 3rem;
-    }
-</style>
-
 {#if mobile}
     <div>foo</div>
 {:else}
@@ -41,14 +27,14 @@
             <Text type="p" secondary classes="mb-8">{locale('views.legal.body')}</Text>
         </div>
         <div slot="leftpane__action">
-            <Checkbox label={locale('views.legal.checkbox')} bind:checked classes="mb-8" />
+            <Checkbox label={locale('views.legal.checkbox')} checked={termsAccepted} classes="mb-8" />
             <Button classes="w-full" disabled={!termsAccepted} onClick={() => handleContinueClick()}>
                 {locale('actions.continue')}
             </Button>
         </div>
         <div slot="rightpane" class="w-full h-full flex items-center px-40 py-20">
-            <Scroller classes="w-full text-justify py-12 pr-10" threshold={70} bind:progress bind:index bind:this={scroller}>
-                <section class="mb-12" bind:this={privacyPolicy}>
+            <div class="w-full text-justify py-12 pr-10 overflow-y-auto">
+                <section class="mb-12">
                     <Text type="h1" classes="mb-5">{locale('views.legal.privacyPolicy.title')}</Text>
                     <Text type="p" secondary classes="mb-5">{locale('views.legal.privacyPolicy.body1')}</Text>
                     <Text type="p" secondary classes="mb-5">{locale('views.legal.privacyPolicy.body2')}</Text>
@@ -57,7 +43,7 @@
                     <Text type="p" secondary classes="mb-5">{locale('views.legal.privacyPolicy.body5')}</Text>
                     <Text type="p" secondary classes="mb-10">{locale('views.legal.privacyPolicy.body6')}</Text>
                 </section>
-                <section bind:this={termsOfService}>
+                <section>
                     <Text type="h1" classes="mb-5">{locale('views.legal.termsOfService.title')}</Text>
                     <Text type="p" secondary classes="mb-5">{locale('views.legal.termsOfService.body1')}</Text>
                     <Text type="p" secondary classes="mb-5">{locale('views.legal.termsOfService.body2')}</Text>
@@ -66,7 +52,13 @@
                     <Text type="p" secondary classes="mb-5">{locale('views.legal.termsOfService.body5')}</Text>
                     <Text type="p" secondary classes="mb-10">{locale('views.legal.termsOfService.body6')}</Text>
                 </section>
-            </Scroller>
+            </div>
         </div>
     </OnboardingLayout>
 {/if}
+
+<style type="text/scss">
+    [slot='rightpane'] section {
+        scroll-margin: 3rem;
+    }
+</style>

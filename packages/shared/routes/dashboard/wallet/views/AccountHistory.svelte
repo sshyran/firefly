@@ -2,8 +2,9 @@
     import { ActivityDetail, ActivityRow, Icon, Text } from 'shared/components'
     import { showAppNotification } from 'shared/lib/notifications'
     import { api, isSyncing, selectedAccountId, selectedMessage } from 'shared/lib/wallet'
+    import type { MessageFormatter } from 'shared/lib/i18n'
 
-    export let locale
+    export let locale: MessageFormatter
     export let transactions = []
     export let color = 'blue'
 

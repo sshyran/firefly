@@ -1,10 +1,11 @@
 <script lang="typescript">
     import { Button, Text } from 'shared/components'
     import { errorLog } from 'shared/lib/events'
-    import { setClipboard } from 'shared/lib/utils'
     import { closePopup } from 'shared/lib/popup'
+    import { setClipboard } from 'shared/lib/utils'
+    import type { MessageFormatter } from 'shared/lib/i18n'
 
-    export let locale
+    export let locale: MessageFormatter
 
     const handleClearClick = () => {
         errorLog.set([])
@@ -17,18 +18,12 @@
         for (const err of $errorLog) {
             str.push(new Date(err.time).toUTCString())
             str.push(`${err.type ?? 'EmptyType'}: ${err.message ? locale(err.message) : 'Missing error message'}`)
-            str.push("")
+            str.push('')
         }
 
         setClipboard(str.join('\r\n'))
     }
 </script>
-
-<style>
-    .history {
-        max-height: 30vh;
-    }
-</style>
 
 <div class="mb-5">
     <Text type="h4">{locale('popups.errorLog.title')}</Text>
@@ -54,3 +49,9 @@
         <Button classes="w-1/2" onClick={() => handleCopyClick()}>{locale('actions.copy')}</Button>
     </div>
 {/if}
+
+<style>
+    .history {
+        max-height: 30vh;
+    }
+</style>

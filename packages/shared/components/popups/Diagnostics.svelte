@@ -1,12 +1,14 @@
 <script lang="typescript">
-    import { Button, Text } from 'shared/components'
-    import { appSettings } from 'shared/lib/appSettings'
-    import { versionDetails } from 'shared/lib/appUpdater'
-    import { Electron } from 'shared/lib/electron'
-    import { activeProfile } from 'shared/lib/profile'
-    import { setClipboard } from 'shared/lib/utils'
+    import { Button,Text } from 'shared/components';
+    import { appSettings } from 'shared/lib/appSettings';
+    import { versionDetails } from 'shared/lib/appUpdater';
+    import { Electron } from 'shared/lib/electron';
+    import { activeProfile } from 'shared/lib/profile';
+    import { setClipboard } from 'shared/lib/utils';
+    import type { MessageFormatter } from 'shared/lib/i18n';
 
-    export let locale
+
+    export let locale: MessageFormatter
 
     let contentApp = ''
     let contentSystem = ''

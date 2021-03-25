@@ -1,10 +1,12 @@
 <script lang="typescript">
-    import { Button, Input, Spinner, Text } from 'shared/components'
-    import { walletRoute } from 'shared/lib/router'
-    import { WalletRoutes } from 'shared/lib/typings/routes'
-    import { wallet, MAX_ACCOUNT_NAME_LENGTH } from 'shared/lib/wallet'
+    import { Button,Input,Spinner,Text } from 'shared/components';
+    import { walletRoute } from 'shared/lib/router';
+    import { WalletRoutes } from 'shared/lib/typings/routes';
+    import { MAX_ACCOUNT_NAME_LENGTH,wallet } from 'shared/lib/wallet';
+    import type { MessageFormatter } from 'shared/lib/i18n';
 
-    export let locale
+
+    export let locale: MessageFormatter
     export let onCreate
     export let error = ''
 
@@ -13,7 +15,7 @@
     let accountAlias
     let isBusy = false
 
-    const handleCreateClick = () => {
+    const handleCreateClick = async () => {
         if (accountAlias) {
             error = ''
             if (accountAlias.length > MAX_ACCOUNT_NAME_LENGTH) {
@@ -27,10 +29,14 @@
                 return (error = locale('error.account.duplicate'))
             }
             isBusy = true
-            onCreate(accountAlias, (err) => {
+
+            try {
+                await onCreate(accountAlias);
+            } catch (err) {
                 error = err || ''
+            } finally {
                 isBusy = false
-            })
+            }
         }
     }
     const handleCancelClick = () => {

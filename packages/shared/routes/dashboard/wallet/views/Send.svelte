@@ -2,6 +2,7 @@
     import { convertUnits, Unit } from '@iota/unit-converter'
     import { Address, Amount, Button, Dropdown, Icon, ProgressBar, Text } from 'shared/components'
     import { clearSendParams, sendParams } from 'shared/lib/app'
+    import type { MessageFormatter } from 'shared/lib/i18n'
     import { accountRoute, walletRoute } from 'shared/lib/router'
     import type { TransferProgressEventType } from 'shared/lib/typings/events'
     import { AccountRoutes, WalletRoutes } from 'shared/lib/typings/routes'
@@ -11,9 +12,9 @@
     import { getContext, onMount } from 'svelte'
     import type { Readable, Writable } from 'svelte/store'
 
-    export let locale
-    export let send
-    export let internalTransfer
+    export let locale: MessageFormatter
+    export let send: (senderAccountId: string, receiveAddress: string, amount: number) => void
+    export let internalTransfer: (senderAccountId: string, receiverAccountId: string, amount: number) => void
 
     const accounts = getContext<Writable<WalletAccount[]>>('walletAccounts')
     const account = getContext<Readable<WalletAccount>>('selectedAccount')
@@ -22,6 +23,8 @@
         EXTERNAL = 'sendPayment',
         INTERNAL = 'moveFunds',
     }
+
+    type FormattedAccount = WalletAccount & { label: string }
 
     let selectedSendType = $sendParams.isInternal ? SEND_TYPE.INTERNAL : SEND_TYPE.EXTERNAL
     let unit = Unit.Mi
@@ -73,18 +76,18 @@
     $: accountsDropdownItems = $accounts.map((acc) => format(acc))
     $: from = $account ? format($account) : accountsDropdownItems[0]
 
-    const handleSendTypeClick = (type) => {
+    const handleSendTypeClick = (type: SEND_TYPE) => {
         selectedSendType = type
         amountError = ''
     }
-    const handleFromSelect = (item) => {
+    const handleFromSelect = (item: FormattedAccount) => {
         from = item
         if (to === from) {
             to = $accounts.length === 2 ? accountsDropdownItems[from.id === $accounts[0].id ? 1 : 0] : undefined
         }
         amountError = ''
     }
-    const handleToSelect = (item) => {
+    const handleToSelect = (item: FormattedAccount) => {
         to = item
         if (from === to) {
             from = undefined
@@ -103,7 +106,7 @@
                 amountError = locale('error.send.amountInvalidFormat')
             } else {
                 const amountAsI = convertUnits(amountAsFloat, unit, Unit.i)
-                if (amountAsI > from.balance) {
+                if (amountAsI > from.rawIotaBalance) {
                     amountError = locale('error.send.amountTooHigh')
                 } else if (amountAsI <= 0) {
                     amountError = locale('error.send.amountZero')
@@ -149,36 +152,20 @@
         }
     }
 
-    const format = (account: WalletAccount) => {
+    function format(account: WalletAccount): FormattedAccount {
         return {
             ...account,
             label: `${account.alias} • ${account.balance}`,
-            balance: account.rawIotaBalance,
+            balance: account.rawIotaBalance.toString(),
         }
     }
     const handleMaxClick = () => {
-        amount = convertUnitsNoE(from.balance, Unit.i, unit)
+        amount = convertUnitsNoE(from.rawIotaBalance, Unit.i, unit)
     }
     onMount(() => {
         to = $accounts.length === 2 ? accountsDropdownItems[from.id === $accounts[0].id ? 1 : 0] : to
     })
 </script>
-
-<style type="text/scss">
-    button.active {
-        @apply relative;
-        &:after {
-            content: '';
-            @apply bg-blue-500;
-            @apply w-full;
-            @apply rounded;
-            @apply h-0.5;
-            @apply absolute;
-            @apply -bottom-2.5;
-            @apply left-0;
-        }
-    }
-</style>
 
 <div class="w-full h-full flex flex-col justify-between p-8">
     <div>
@@ -188,7 +175,8 @@
                     on:click={() => handleSendTypeClick(SEND_TYPE.EXTERNAL)}
                     disabled={$isTransferring}
                     class={$isTransferring ? 'cursor-auto' : 'cursor-pointer'}
-                    class:active={SEND_TYPE.EXTERNAL === selectedSendType && !$isTransferring}>
+                    class:active={SEND_TYPE.EXTERNAL === selectedSendType && !$isTransferring}
+                >
                     <Text classes="text-left" type="h5" secondary={SEND_TYPE.EXTERNAL !== selectedSendType || $isTransferring}>
                         {locale(`general.${SEND_TYPE.EXTERNAL}`)}
                     </Text>
@@ -198,11 +186,13 @@
                         on:click={() => handleSendTypeClick(SEND_TYPE.INTERNAL)}
                         disabled={$isTransferring}
                         class={$isTransferring ? 'cursor-auto' : 'cursor-pointer'}
-                        class:active={SEND_TYPE.INTERNAL === selectedSendType && !$isTransferring}>
+                        class:active={SEND_TYPE.INTERNAL === selectedSendType && !$isTransferring}
+                    >
                         <Text
                             classes="text-left"
                             type="h5"
-                            secondary={SEND_TYPE.INTERNAL !== selectedSendType || $isTransferring}>
+                            secondary={SEND_TYPE.INTERNAL !== selectedSendType || $isTransferring}
+                        >
                             {locale(`general.${SEND_TYPE.INTERNAL}`)}
                         </Text>
                     </button>
@@ -222,7 +212,8 @@
                             placeholder={locale('general.from')}
                             items={accountsDropdownItems}
                             onSelect={handleFromSelect}
-                            disabled={$accounts.length === 1 || $isTransferring} />
+                            disabled={$accounts.length === 1 || $isTransferring}
+                        />
                     </div>
                 {/if}
                 <div class="w-full block">
@@ -234,7 +225,8 @@
                         {locale}
                         classes="mb-6"
                         disabled={$isTransferring}
-                        autofocus />
+                        autofocus
+                    />
                     {#if selectedSendType === SEND_TYPE.INTERNAL}
                         <Dropdown
                             value={to?.label || null}
@@ -242,15 +234,16 @@
                             placeholder={locale('general.to')}
                             items={accountsDropdownItems.filter((a) => from && a.id !== from.id)}
                             onSelect={handleToSelect}
-                            disabled={$isTransferring || $accounts.length === 2} />
+                            disabled={$isTransferring || $accounts.length === 2}
+                        />
                     {:else}
                         <Address
                             error={addressError}
                             bind:address={$sendParams.address}
-                            {locale}
                             label={locale('general.sendToAddress')}
                             disabled={$isTransferring}
-                            placeholder={`${locale('general.sendToAddress')}\n${addressPrefix}...`} />
+                            placeholder={`${locale('general.sendToAddress')}\n${addressPrefix}...`}
+                        />
                     {/if}
                 </div>
             </div>
@@ -266,3 +259,19 @@
         <ProgressBar message={transferSteps[$transferState]?.label} percent={transferSteps[$transferState]?.percent} />
     {/if}
 </div>
+
+<style type="text/scss">
+    button.active {
+        @apply relative;
+        &:after {
+            content: '';
+            @apply bg-blue-500;
+            @apply w-full;
+            @apply rounded;
+            @apply h-0.5;
+            @apply absolute;
+            @apply -bottom-2.5;
+            @apply left-0;
+        }
+    }
+</style>

@@ -4,10 +4,11 @@
     import { AccountRoutes } from 'shared/lib/typings/routes'
     import type { WalletAccount } from 'shared/lib/wallet'
     import { getContext } from 'svelte'
+    import type { MessageFormatter } from 'shared/lib/i18n'
     import type { Readable } from 'svelte/store'
     import { ManageAccount, Receive, Send } from '.'
 
-    export let locale
+    export let locale: MessageFormatter
     export let send
     export let generateAddress
     export let internalTransfer

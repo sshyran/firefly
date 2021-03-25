@@ -6,9 +6,10 @@
     import { activeProfile, updateProfile } from 'shared/lib/profile'
     import type { ClientOptions } from 'shared/lib/typings/client'
     import { api, wallet, WalletAccount } from 'shared/lib/wallet'
+    import type { MessageFormatter } from 'shared/lib/i18n'
     import { get } from 'svelte/store'
 
-    export let locale
+    export let locale: MessageFormatter
 
     const { accounts } = $wallet
 

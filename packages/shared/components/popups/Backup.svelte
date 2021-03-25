@@ -1,15 +1,17 @@
 <script lang="typescript">
-    import { Button, Text, Logo } from 'shared/components'
-    import { Electron } from 'shared/lib/electron'
-    import { getBackupWarningColor } from 'shared/lib/helpers'
-    import { closePopup, openPopup } from 'shared/lib/popup'
-    import { updateProfile } from 'shared/lib/profile'
-    import { api } from 'shared/lib/wallet'
-    import { date } from 'svelte-i18n'
-    import { showAppNotification } from 'shared/lib/notifications'
+    import { Button,Logo,Text } from 'shared/components';
+    import { Electron } from 'shared/lib/electron';
+    import { getBackupWarningColor } from 'shared/lib/helpers';
+    import { showAppNotification } from 'shared/lib/notifications';
+    import { closePopup,openPopup } from 'shared/lib/popup';
+    import { updateProfile } from 'shared/lib/profile';
     import { getDefaultStrongholdName } from 'shared/lib/utils';
+    import { api } from 'shared/lib/wallet';
+    import { date } from 'svelte-i18n';
+    import type { MessageFormatter } from 'shared/lib/i18n';
 
-    export let locale
+
+    export let locale: MessageFormatter
     export let lastBackupDate
     export let lastBackupDateFormatted
     export let isStrongholdLocked

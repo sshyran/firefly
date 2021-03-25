@@ -1,19 +1,21 @@
 <script lang="typescript">
-    import { Idle, Sidebar } from 'shared/components'
-    import { logout, sendParams } from 'shared/lib/app'
-    import { appSettings } from 'shared/lib/appSettings'
-    import { deepLinkRequestActive } from 'shared/lib/deepLinking'
-    import { Electron } from 'shared/lib/electron'
-    import { dashboardRoute, routerNext } from 'shared/lib/router'
-    import { Tabs } from 'shared/lib/typings/routes'
-    import { parseDeepLink } from 'shared/lib/utils'
-    import { api, STRONGHOLD_PASSWORD_CLEAR_INTERVAL_SECS } from 'shared/lib/wallet'
-    import { Settings, Wallet } from 'shared/routes'
-    import { onMount } from 'svelte'
-    import { get } from 'svelte/store'
+    import { Idle,Sidebar } from 'shared/components';
+    import { logout,sendParams } from 'shared/lib/app';
+    import { appSettings } from 'shared/lib/appSettings';
+    import { deepLinkRequestActive } from 'shared/lib/deepLinking';
+    import { Electron } from 'shared/lib/electron';
+    import { dashboardRoute,routerNext } from 'shared/lib/router';
+    import { Tabs } from 'shared/lib/typings/routes';
+    import { parseDeepLink } from 'shared/lib/utils';
+    import { api,STRONGHOLD_PASSWORD_CLEAR_INTERVAL_SECS } from 'shared/lib/wallet';
+    import { Settings,Wallet } from 'shared/routes';
+    import { onMount } from 'svelte';
+    import type { MessageFormatter } from 'shared/lib/i18n';
+    import { get } from 'svelte/store';
 
-    export let locale
-    export let mobile
+
+    export let locale: MessageFormatter
+    export let mobile: boolean
 
     const tabs = {
         wallet: Wallet,

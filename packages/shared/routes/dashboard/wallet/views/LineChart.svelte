@@ -1,23 +1,25 @@
 <script lang="typescript">
-    import { Chart, Dropdown, Text } from 'shared/components'
+    import { Chart,Dropdown,Text } from 'shared/components';
     import {
-        chartCurrency,
-        ChartData,
-        chartTimeframe,
-        DashboardChartType,
-        getAccountValueData,
-        getPortfolioData,
-        getTokenData,
-        selectedChart,
-    } from 'shared/lib/chart'
-    import { CurrencyTypes, formatCurrencyValue } from 'shared/lib/currency'
-    import { HistoryDataProps, TIMEFRAME_MAP } from 'shared/lib/marketData'
-    import { activeProfile } from 'shared/lib/profile'
-    import type { AccountsBalanceHistory, BalanceHistory, WalletAccount } from 'shared/lib/wallet'
-    import { getContext, onMount } from 'svelte'
-    import type { Readable } from 'svelte/store'
+    chartCurrency,
+    ChartData,
+    chartTimeframe,
+    DashboardChartType,
+    getAccountValueData,
+    getPortfolioData,
+    getTokenData,
+    selectedChart
+    } from 'shared/lib/chart';
+    import { CurrencyTypes,formatCurrencyValue } from 'shared/lib/currency';
+    import { HistoryDataProps,TIMEFRAME_MAP } from 'shared/lib/marketData';
+    import { activeProfile } from 'shared/lib/profile';
+    import type { AccountsBalanceHistory,BalanceHistory,WalletAccount } from 'shared/lib/wallet';
+    import { getContext,onMount } from 'svelte';
+    import type { MessageFormatter } from 'shared/lib/i18n';
+    import type { Readable } from 'svelte/store';
 
-    export let locale
+
+    export let locale: MessageFormatter
 
     const walletBalanceHistory = getContext<Readable<BalanceHistory>>('walletBalanceHistory')
     const accountsBalanceHistory = getContext<Readable<AccountsBalanceHistory>>('accountsBalanceHistory')

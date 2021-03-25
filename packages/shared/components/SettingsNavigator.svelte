@@ -1,8 +1,10 @@
 <script lang="typescript">
-    import { Icon, Text } from 'shared/components'
+    import { Icon,Text } from 'shared/components';
+    import type { MessageFormatter } from 'shared/lib/i18n';
+
 
     export let settings
-    export let locale
+    export let locale: MessageFormatter
     export let routes
     export let route
     export let icons

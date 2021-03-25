@@ -1,11 +1,11 @@
 <script lang="typescript">
-    import { createEventDispatcher } from 'svelte'
     import { Transition } from 'shared/components'
-    import { SelectProfile, EnterPin } from './views/'
-    import { api } from 'shared/lib/wallet'
+    import { createEventDispatcher } from 'svelte'
+    import type { MessageFormatter } from 'shared/lib/i18n'
+    import { EnterPin, SelectProfile } from './views'
 
-    export let locale
-    export let mobile
+    export let locale: MessageFormatter
+    export let mobile: boolean
 
     enum LoginState {
         Init = 'init',
@@ -14,15 +14,11 @@
 
     const dispatch = createEventDispatcher()
 
-    let importType
-    let importFile
-    let importFilePath
-
     let state: LoginState = LoginState.Init
     let stateHistory = []
 
-    const _next = (event) => {
-        let nextState
+    const _next = (event: { detail: { [id: string]: string } }) => {
+        let nextState: LoginState
         let params = event.detail || {}
         switch (state) {
             case LoginState.Init:

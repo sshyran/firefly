@@ -6,14 +6,15 @@ import { HistoryDataProps } from 'shared/lib/marketData'
 import { DEFAULT_NODE, DEFAULT_NODES, network } from 'shared/lib/network'
 import { showAppNotification, showSystemNotification } from 'shared/lib/notifications'
 import { activeProfile, isStrongholdLocked } from 'shared/lib/profile'
-import type { Account, Account as BaseAccount, SyncedAccount } from 'shared/lib/typings/account'
+import type { Account, AccountToCreate, Balance, SyncedAccount } from 'shared/lib/typings/account'
 import type { Address } from 'shared/lib/typings/address'
 import type { Actor } from 'shared/lib/typings/bridge'
-import type { ErrorEventPayload, TransferProgressEventType } from 'shared/lib/typings/events'
+import type { ErrorEventPayload, Event, TransferProgressEventType } from 'shared/lib/typings/events'
 import type { Message } from 'shared/lib/typings/message'
 import { formatUnit } from 'shared/lib/units'
 import type { ApiClient } from 'shared/lib/walletApi'
 import { get, writable, Writable } from 'svelte/store'
+import { openPopup } from './popup'
 
 const ACCOUNT_COLORS = ['turquoise', 'green', 'orange', 'yellow', 'purple', 'pink']
 
@@ -273,10 +274,10 @@ export const asyncRestoreBackup = (importFilePath, password) => {
     })
 }
 
-export const asyncCreateAccount = () => {
-    return new Promise<void>((resolve, reject) => {
+export const asyncCreateAccount = (createInfo?: AccountToCreate): Promise<Event<Account>> => {
+    return new Promise<Event<Account>>((resolve, reject) => {
         api.createAccount(
-            {
+            createInfo ?? {
                 signerType: { type: 'Stronghold' },
                 clientOptions: {
                     node: DEFAULT_NODE,
@@ -284,6 +285,21 @@ export const asyncCreateAccount = () => {
                     network: get(network),
                 },
             },
+            {
+                onSuccess(response) {
+                    resolve(response)
+                },
+                onError(err) {
+                    reject(err)
+                },
+            }
+        )
+    })
+}
+
+export const syncAccountAsync = (accountId: string): Promise<void> => {
+    return new Promise<void>((resolve, reject) => {
+        api.syncAccount(accountId,
             {
                 onSuccess() {
                     resolve()
@@ -295,6 +311,179 @@ export const asyncCreateAccount = () => {
         )
     })
 }
+
+export const syncAccountsAsync = (): Promise<Event<SyncedAccount[]>> => {
+    return new Promise<Event<SyncedAccount[]>>((resolve, reject) => {
+        api.syncAccounts(
+            {
+                onSuccess(response) {
+                    resolve(response)
+                },
+                onError(err) {
+                    reject(err)
+                },
+            }
+        )
+    })
+}
+
+export const getStrongholdStatusAsync = () => {
+    return new Promise<boolean>((resolve, reject) => {
+        api.getStrongholdStatus(
+            {
+                onSuccess(strongholdStatusResponse) {
+                    resolve(strongholdStatusResponse.payload.snapshot.status === 'Locked')
+                },
+                onError(err) {
+                    reject(err)
+                },
+            }
+        )
+    })
+}
+
+export const getBalanceAsync = (accountId): Promise<Event<Balance>> => {
+    return new Promise<Event<Balance>>((resolve, reject) => {
+        api.getBalance(accountId,
+            {
+                onSuccess(response) {
+                    resolve(response)
+                },
+                onError(err) {
+                    reject(err)
+                },
+            }
+        )
+    })
+}
+
+export const latestAddressAsync = (accountId): Promise<Event<Address>> => {
+    return new Promise<Event<Address>>((resolve, reject) => {
+        api.latestAddress(accountId,
+            {
+                onSuccess(response) {
+                    resolve(response)
+                },
+                onError(err) {
+                    reject(err)
+                },
+            }
+        )
+    })
+}
+
+export const getUnusedAddressAsync = (accountId): Promise<Event<Address>> => {
+    return new Promise<Event<Address>>((resolve, reject) => {
+        api.getUnusedAddress(accountId,
+            {
+                onSuccess(response) {
+                    resolve(response)
+                },
+                onError(err) {
+                    reject(err)
+                },
+            }
+        )
+    })
+}
+
+export const getAccountsAsync = (): Promise<Event<Account[]>> => {
+    return new Promise<Event<Account[]>>((resolve, reject) => {
+        api.getAccounts(
+            {
+                onSuccess(response) {
+                    resolve(response)
+                },
+                onError(err) {
+                    reject(err)
+                },
+            }
+        )
+    })
+}
+
+export const sendAsync = (senderAccountId: string, transfer: {
+    amount: number,
+    address: string,
+    remainder_value_strategy: {
+        strategy: string,
+    },
+    indexation: { index: string, data: number[] },
+}): Promise<Event<Message>> => {
+    return new Promise<Event<Message>>((resolve, reject) => {
+        api.send(
+            senderAccountId,
+            transfer,
+            {
+                onSuccess(response) {
+                    resolve(response)
+                },
+                onError(err) {
+                    reject(err)
+                },
+            }
+        )
+    })
+}
+
+export const internalTransferAsync = (senderAccountId: string, receiverAccountId: string, amount: number): Promise<Event<Message>> => {
+    return new Promise<Event<Message>>((resolve, reject) => {
+        api.internalTransfer(
+            senderAccountId,
+            receiverAccountId,
+            amount,
+            {
+                onSuccess(response) {
+                    resolve(response)
+                },
+                onError(err) {
+                    reject(err)
+                },
+            }
+        )
+    })
+}
+
+export const setAliasAsync = (accountId: string, alias: string): Promise<Event<void>> => {
+    return new Promise<Event<void>>((resolve, reject) => {
+        api.setAlias(accountId, alias,
+            {
+                onSuccess(response) {
+                    resolve(response)
+                },
+                onError(err) {
+                    reject(err)
+                },
+            }
+        )
+    })
+}
+
+export const unlockIfRequired = async (action: (cancelled: boolean) => Promise<void>) => {
+    try {
+        const isLocked = await getStrongholdStatusAsync()
+
+        if (isLocked) {
+            openPopup({
+                type: 'password',
+                props: {
+                    onSuccess: async () => {
+                        await action(false)
+                    },
+                    onCancelled: () => action(true)
+                }
+            })
+        } else {
+            await action(false)
+        }
+    } catch (err) {
+        showAppNotification({
+            type: 'error',
+            message: localize(err.error),
+        })
+    }
+}
+
 
 /**
  * Initialises event listeners from wallet library
@@ -763,7 +952,7 @@ export const updateBalanceOverviewFiat = (): void => {
 *
 * @returns {void}
 */
-export const updateAccounts = (syncedAccounts: SyncedAccount[]): void => {
+export const updateAccounts = async (syncedAccounts: SyncedAccount[]): Promise<void> => {
     const { accounts } = get(wallet)
 
     const existingAccountIds = get(accounts).map((account) => account.id)
@@ -800,44 +989,38 @@ export const updateAccounts = (syncedAccounts: SyncedAccount[]): void => {
 
         const _accounts = []
 
-        for (const [idx, newAccount] of newAccounts.entries()) {
-            getAccountMeta(newAccount.id, (err, meta) => {
-                if (!err) {
-                    totalBalance.balance += meta.balance
-                    totalBalance.incoming += meta.incoming
-                    totalBalance.outgoing += meta.outgoing
+        for (const newAccount of newAccounts) {
+            const meta = await getAccountMeta(newAccount.id)
 
-                    const account = prepareAccountInfo(Object.assign<
-                        WalletAccount, WalletAccount, Partial<WalletAccount>
-                    >({} as WalletAccount, newAccount, {
-                        alias: `Account ${newAccount.index + 1}`,
-                        clientOptions: existingAccounts[0].clientOptions,
-                        createdAt: new Date().toISOString(),
-                        signerType: existingAccounts[0].signerType,
-                        depositAddress: newAccount.depositAddress.address
-                    }), meta)
+            totalBalance.balance += meta.balance
+            totalBalance.incoming += meta.incoming
+            totalBalance.outgoing += meta.outgoing
 
-                    _accounts.push(account)
+            const account = prepareAccountInfo(Object.assign<
+                WalletAccount, WalletAccount, Partial<WalletAccount>
+            >({} as WalletAccount, newAccount, {
+                alias: `Account ${newAccount.index + 1}`,
+                clientOptions: existingAccounts[0].clientOptions,
+                createdAt: new Date().toISOString(),
+                signerType: existingAccounts[0].signerType,
+                depositAddress: newAccount.depositAddress.address
+            }), meta)
 
-                    if (idx === newAccounts.length - 1) {
-                        const { balanceOverview } = get(wallet);
-                        const overview = get(balanceOverview);
-
-                        accounts.update(() => {
-                            return [...updatedStoredAccounts, ..._accounts]
-                        })
-
-                        updateBalanceOverview(
-                            overview.balanceRaw + totalBalance.balance,
-                            overview.incomingRaw + totalBalance.incoming,
-                            overview.outgoingRaw + totalBalance.outgoing
-                        )
-                    }
-                } else {
-                    console.error(err)
-                }
-            })
+            _accounts.push(account)
         }
+
+        const { balanceOverview } = get(wallet);
+        const overview = get(balanceOverview);
+
+        accounts.update(() => {
+            return [...updatedStoredAccounts, ..._accounts]
+        })
+
+        updateBalanceOverview(
+            overview.balanceRaw + totalBalance.balance,
+            overview.incomingRaw + totalBalance.incoming,
+            overview.outgoingRaw + totalBalance.outgoing
+        )
     } else {
         accounts.update(() => updatedStoredAccounts);
     }
@@ -992,59 +1175,41 @@ export const getWalletBalanceHistory = (accountsBalanceHistory: AccountsBalanceH
 /**
  * Sync the accounts
  */
-export function syncAccounts() {
-    isSyncing.set(true)
-    api.syncAccounts({
-        onSuccess(syncAccountsResponse) {
-            const syncedAccounts = syncAccountsResponse.payload
-
-            updateAccounts(syncedAccounts)
-
-            isSyncing.set(false)
-        },
-        onError(err) {
-            isSyncing.set(false)
-            showAppNotification({
-                type: 'error',
-                message: localize(err.error),
-            })
-        },
-    })
+export async function syncAccounts() {
+    try {
+        isSyncing.set(true)
+        const syncAccountsResponse = await syncAccountsAsync()
+        await updateAccounts(syncAccountsResponse.payload)
+    } catch (err) {
+        showAppNotification({
+            type: 'error',
+            message: localize(err.error),
+        })
+    } finally {
+        isSyncing.set(false)
+    }
 }
 
-export const getAccountMeta = (accountId: string, callback: (
-    error: ErrorEventPayload,
-    meta?: {
-        balance: number
-        incoming: number
-        outgoing: number
-        depositAddress: string
+export const getAccountMeta = async (accountId: string): Promise<{
+    balance: number
+    incoming: number
+    outgoing: number
+    depositAddress: string
+}> => {
+    const balanceResponse = await getBalanceAsync(accountId)
+
+    const latestAddressResponse = await latestAddressAsync(accountId)
+
+    return {
+        balance: balanceResponse.payload.total,
+        incoming: balanceResponse.payload.incoming,
+        outgoing: balanceResponse.payload.outgoing,
+        depositAddress: latestAddressResponse.payload.address,
     }
-) => void) => {
-    api.getBalance(accountId, {
-        onSuccess(balanceResponse) {
-            api.latestAddress(accountId, {
-                onSuccess(latestAddressResponse) {
-                    callback(null, {
-                        balance: balanceResponse.payload.total,
-                        incoming: balanceResponse.payload.incoming,
-                        outgoing: balanceResponse.payload.outgoing,
-                        depositAddress: latestAddressResponse.payload.address,
-                    })
-                },
-                onError(error) {
-                    callback(error)
-                },
-            })
-        },
-        onError(error) {
-            callback(error)
-        },
-    })
 }
 
 export const prepareAccountInfo = (
-    account: BaseAccount,
+    account: Account,
     meta: {
         balance: number
         incoming: number
@@ -1057,7 +1222,7 @@ export const prepareAccountInfo = (
 
     const activeCurrency = get(activeProfile)?.settings.currency ?? CurrencyTypes.USD
 
-    return Object.assign<WalletAccount, BaseAccount, Partial<WalletAccount>>({} as WalletAccount, account, {
+    return Object.assign<WalletAccount, Account, Partial<WalletAccount>>({} as WalletAccount, account, {
         id,
         index,
         depositAddress,

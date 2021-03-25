@@ -1,5 +1,6 @@
 <script lang="typescript">
     import { Icon, Input, Text } from 'shared/components'
+    import type { MessageFormatter } from 'shared/lib/i18n'
 
     export let value = ''
     export let classes = ''
@@ -8,7 +9,7 @@
     export let showRevealToggle = false
     export let strengthLevels = 4
     export let placeholder = undefined
-    export let locale = undefined
+    export let locale: MessageFormatter
     export let maxlength = undefined
     export let error = null
     export let integer = false
@@ -27,27 +28,14 @@
     const STRENGTH_COLORS = ['gray-300', 'orange-500', 'yellow-600', 'yellow-300', 'green-700']
 </script>
 
-<style type="text/scss">
-    div {
-        &:disabled {
-            @apply pointer-events-none;
-            @apply opacity-50;
-        }
-        strength-meter {
-            span {
-                width: 22px;
-                height: 4px;
-            }
-        }
-    }
-</style>
-
 <div class={classes} class:disabled>
     {#if showStrengthLevel}
         <strength-meter class="flex flex-row justify-between items-center mb-2">
             <div class="flex flex-row">
-                <Text smaller secondary>{locale("general.passwordStrength")}:</Text>
-                <Text smaller overrideColor classes={`text-${STRENGTH_COLORS[strength]} uppercase ml-2`}>{locale(`general.passwordStrength${strength}`)}</Text>
+                <Text smaller secondary>{locale('general.passwordStrength')}:</Text>
+                <Text smaller overrideColor classes={`text-${STRENGTH_COLORS[strength]} uppercase ml-2`}
+                    >{locale(`general.passwordStrength${strength}`)}</Text
+                >
             </div>
             <div class="flex flex-row justify-end">
                 {#each Array(strengthLevels) as _, i}
@@ -67,7 +55,8 @@
             {disabled}
             placeholder={placeholder || locale('general.password')}
             {submitHandler}
-            spellcheck="false" />
+            spellcheck="false"
+        />
         {#if showRevealToggle === true && !disabled}
             <button type="button" on:click={() => revealToggle()} tabindex="-1" class="absolute top-3 right-3">
                 <Icon icon={revealed ? 'view' : 'hide'} classes="text-blue-500" />
@@ -75,3 +64,18 @@
         {/if}
     </div>
 </div>
+
+<style type="text/scss">
+    div {
+        &:disabled {
+            @apply pointer-events-none;
+            @apply opacity-50;
+        }
+        strength-meter {
+            span {
+                width: 22px;
+                height: 4px;
+            }
+        }
+    }
+</style>

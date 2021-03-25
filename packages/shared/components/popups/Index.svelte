@@ -1,6 +1,7 @@
 <script lang="typescript">
     import { Icon } from 'shared/components'
     import { closePopup } from 'shared/lib/popup'
+    import type { MessageFormatter } from 'shared/lib/i18n'
     import { fade } from 'svelte/transition'
     import AddNode from './AddNode.svelte'
     import AddressHistory from './AddressHistory.svelte'
@@ -15,7 +16,7 @@
     import RemoveNode from './RemoveNode.svelte'
     import Version from './Version.svelte'
 
-    export let locale = 'en'
+    export let locale: MessageFormatter
     export let type = undefined
     export let props = undefined
     export let hideClose = undefined
@@ -47,6 +48,24 @@
     }
 </script>
 
+<svelte:window on:keydown={onkey} />
+<popup
+    in:fade={{ duration: transition ? 100 : 0 }}
+    class={`flex items-center justify-center fixed top-0 left-0 w-screen p-6
+                h-full overflow-hidden z-10 ${fullScreen ? 'bg-white dark:bg-gray-900' : 'bg-gray-800 bg-opacity-40'}`}
+>
+    <popup-content
+        class={`bg-white rounded-xl pt-6 px-8 pb-8 relative ${fullScreen ? 'full-screen dark:bg-gray-900' : 'dark:bg-gray-900'}`}
+    >
+        {#if !hideClose}
+            <button on:click={closePopup} class="absolute top-6 right-8">
+                <Icon icon="close" classes="text-gray-800 dark:text-white" />
+            </button>
+        {/if}
+        <svelte:component this={types[type]} {...props} {locale} />
+    </popup-content>
+</popup>
+
 <style type="text/scss">
     popup {
         popup-content {
@@ -60,19 +79,3 @@
         }
     }
 </style>
-
-<svelte:window on:keydown={onkey} />
-<popup
-    in:fade={{ duration: transition ? 100 : 0 }}
-    class={`flex items-center justify-center fixed top-0 left-0 w-screen p-6
-                h-full overflow-hidden z-10 ${fullScreen ? 'bg-white dark:bg-gray-900' : 'bg-gray-800 bg-opacity-40'}`}>
-    <popup-content
-        class={`bg-white rounded-xl pt-6 px-8 pb-8 relative ${fullScreen ? 'full-screen dark:bg-gray-900' : 'dark:bg-gray-900'}`}>
-        {#if !hideClose}
-            <button on:click={closePopup} class="absolute top-6 right-8">
-                <Icon icon="close" classes="text-gray-800 dark:text-white" />
-            </button>
-        {/if}
-        <svelte:component this={types[type]} {...props} {locale} />
-    </popup-content>
-</popup>

@@ -1,20 +1,21 @@
 <script lang="typescript">
     import { Text } from 'shared/components'
-    import { getInitials as _getInitials } from 'shared/lib/helpers'
+    import { getInitials } from 'shared/lib/helpers'
+    import type { MessageFormatter } from 'shared/lib/i18n'
 
     export let classes = undefined
-    export let locale
+    export let locale: MessageFormatter
 
     export let name = ''
     export let id = ''
     export let isDeveloper = false
-    export let onClick = () => ''
+    export let onClick: (id: string) => void
     export let bgColor
 
     let slots = $$props.$$slots
 
-    function getInitials() {
-        const initials = _getInitials(name)
+    function getSingleInitial() {
+        const initials = getInitials(name)
         if (initials.length === 1) {
             return initials
         } else {
@@ -28,11 +29,14 @@
     <div class="flex flex-col justify-between items-center">
         <div
             on:click={() => onClick(id)}
-            class="h-20 w-20 {bgColor ? `bg-${bgColor}-500` : ''} rounded-full font-bold text-center flex items-center justify-center {classes}">
+            class="h-20 w-20 {bgColor
+                ? `bg-${bgColor}-500`
+                : ''} rounded-full font-bold text-center flex items-center justify-center {classes}"
+        >
             {#if slots}
                 <slot />
             {:else}
-                <Text type="h3" classes="text-white">{getInitials()}</Text>
+                <Text type="h3" classes="text-white">{getSingleInitial()}</Text>
             {/if}
         </div>
         <Text type="h5" classes="mt-5 text-center">{name}</Text>

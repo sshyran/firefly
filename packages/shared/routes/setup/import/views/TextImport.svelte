@@ -1,14 +1,17 @@
 <script lang="typescript">
+    import { Button, Illustration, ImportTextfield, OnboardingLayout, Text } from 'shared/components'
+    import type { MessageFormatter } from 'shared/lib/i18n'
     import { createEventDispatcher } from 'svelte'
-    import { OnboardingLayout, Illustration, Text, ImportTextfield, Button } from 'shared/components'
-    export let locale
-    export let mobile
+    import { isSeed } from '../import'
+
+    export let locale: MessageFormatter
+    export let mobile: boolean
 
     let input = ''
-    let isSeed = false
+    let isSeedValue = false
 
     // TODO: remove this to enable seed support
-    $: isSeed = input.length === 81
+    $: isSeedValue = isSeed(input)
 
     const dispatch = createEventDispatcher()
 
@@ -30,13 +33,13 @@
             <Text type="p" secondary classes="mb-8">{locale('views.importFromText.body2')}</Text>
             <Text type="h5" classes="mb-4">{locale('views.importFromText.body3')}</Text>
             <ImportTextfield bind:value={input} {locale} />
-            {#if isSeed}
+            {#if isSeedValue}
                 <!-- TODO: remove this when enabling seed support -->
                 <Text type="p" error secondary classes="mt-4">Seeds are not currently supported.</Text>
             {/if}
         </div>
         <div slot="leftpane__action" class="flex flex-row flex-wrap justify-between items-center space-x-4">
-            <Button classes="flex-1" disabled={input.length === 0 || isSeed} onClick={() => handleContinueClick()}>
+            <Button classes="flex-1" disabled={input.length === 0 || isSeedValue} onClick={() => handleContinueClick()}>
                 {locale('actions.continue')}
             </Button>
         </div>

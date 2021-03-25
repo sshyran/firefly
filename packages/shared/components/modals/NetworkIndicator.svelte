@@ -1,9 +1,11 @@
 <script lang="typescript">
-    import { onDestroy } from 'svelte'
-    import { Text, Modal, HR } from 'shared/components'
+    import { HR, Modal, Text } from 'shared/components'
     import { networkStatus } from 'shared/lib/networkStatus'
+    import { onDestroy } from 'svelte'
+    import type { MessageFormatter } from 'shared/lib/i18n'
+
     export let isActive
-    export let locale
+    export let locale: MessageFormatter
     let healthStatus = 2
     let healthStatusText = 'networkOperational'
     let messagesPerSecond = 0

@@ -14,10 +14,11 @@
         SettingsRoutesNoProfile,
     } from 'shared/lib/typings/routes'
     import { onMount } from 'svelte'
-    import { Advanced, General, Security, Help } from './'
+    import type { MessageFormatter } from 'shared/lib/i18n'
+    import { Advanced, General, Help, Security } from '.'
 
-    export let locale
-    export let mobile
+    export let locale: MessageFormatter
+    export let mobile: boolean
 
     let scroller
     let index
@@ -82,7 +83,8 @@
             icons={SettingsIcons}
             {settings}
             {locale}
-            bind:route={$settingsRoute} />
+            bind:route={$settingsRoute}
+        />
         <div class="h-full w-full pb-10">
             <Text type="p" secondary highlighted classes="mb-8">
                 {locale('views.settings.settings')}

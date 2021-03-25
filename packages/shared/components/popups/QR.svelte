@@ -1,6 +1,8 @@
 <script lang="typescript">
-    import { Text, QR } from 'shared/components'
-    export let locale
+    import { QR, Text } from 'shared/components'
+    import type { MessageFormatter } from 'shared/lib/i18n'
+
+    export let locale: MessageFormatter
     export let data
 </script>
 

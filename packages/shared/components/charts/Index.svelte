@@ -6,21 +6,19 @@
         Bar = 'bar',
     }
 
-    export let type: ChartType
+    export let type: "line" | "bar"
     export let datasets
     export let labels
-    export let tooltips
     export let color
     export let xMaxTicks
     export let yMaxTicks
-    export let yPrecision
     export let beginAtZero
     export let inlineStyle
     export let formatYAxis
 </script>
 
 {#if type === ChartType.Line}
-    <LineChart {formatYAxis} {datasets} {labels} {tooltips} {xMaxTicks} {yMaxTicks} {yPrecision} {beginAtZero} {color} {inlineStyle} />
+    <LineChart {formatYAxis} {datasets} {labels} {xMaxTicks} {yMaxTicks} {beginAtZero} {color} {inlineStyle} />
 {:else if type === ChartType.Bar}
-    <BarChart {formatYAxis} {datasets} {labels} {tooltips} {inlineStyle} />
+    <BarChart {formatYAxis} {datasets} {labels} {inlineStyle} />
 {/if}

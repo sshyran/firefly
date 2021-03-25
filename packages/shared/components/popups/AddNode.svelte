@@ -1,13 +1,15 @@
 <script lang="typescript">
-    import { Button, Checkbox, Input, Password, Text } from 'shared/components'
-    import { DEFAULT_NODES, isNodeValid } from 'shared/lib/network'
-    import { showAppNotification } from 'shared/lib/notifications'
-    import { closePopup } from 'shared/lib/popup'
-    import { activeProfile, updateProfile } from 'shared/lib/profile'
-    import type { ClientOptions, Node } from 'shared/lib/typings/client'
-    import { api, wallet, WalletAccount } from 'shared/lib/wallet'
+    import { Button,Checkbox,Input,Password,Text } from 'shared/components';
+    import { DEFAULT_NODES,isNodeValid } from 'shared/lib/network';
+    import { showAppNotification } from 'shared/lib/notifications';
+    import { closePopup } from 'shared/lib/popup';
+    import { activeProfile,updateProfile } from 'shared/lib/profile';
+    import type { ClientOptions,Node } from 'shared/lib/typings/client';
+    import { api,wallet,WalletAccount } from 'shared/lib/wallet';
+    import type { MessageFormatter } from 'shared/lib/i18n';
 
-    export let locale
+
+    export let locale: MessageFormatter
 
     const { accounts } = $wallet
 

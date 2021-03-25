@@ -2,18 +2,19 @@
     import { Button, Icon, OnboardingLayout, RecoveryPhrase, Text } from 'shared/components'
     import { downloadRecoveryKit } from 'shared/lib/utils'
     import { createEventDispatcher } from 'svelte'
+    import type { MessageFormatter } from 'shared/lib/i18n'
 
-    export let locale
-    export let mobile
-    export let mnemonic
-    export let busy
+    export let locale: MessageFormatter
+    export let mobile: boolean
+    export let mnemonic: string[] | undefined
+    export let busy: boolean
 
     const dispatch = createEventDispatcher()
     let hide = true
     let hasRevealedRecoveryPhrase = false
 
-    function handleContinueClick(options) {
-        dispatch('next', { options })
+    function handleContinueClick() {
+        dispatch('next')
     }
     function handleBackClick() {
         dispatch('previous')
@@ -41,12 +42,12 @@
             <Button secondary classes="flex-1 mb-4" onClick={() => handleDownloadClick()}>
                 {locale('actions.downloadRecoveryKit')}
             </Button>
-            <Button disabled={!hasRevealedRecoveryPhrase} classes="flex-1" onClick={() => handleContinueClick('verify')}>
+            <Button disabled={!hasRevealedRecoveryPhrase} classes="flex-1" onClick={() => handleContinueClick()}>
                 {locale('actions.continue')}
             </Button>
         </div>
         <div slot="rightpane" class="w-full h-full flex flex-col items-center justify-center p-4">
-            {#if mnemonic !== undefined && mnemonic !== null}
+            {#if !mnemonic}
                 <RecoveryPhrase classes="mb-8" recoveryPhrase={mnemonic} {hide} />
                 {#if !hasRevealedRecoveryPhrase}
                     {#if hide}
@@ -55,7 +56,11 @@
                         </Button>
                     {/if}
                 {:else}
-                    <button on:click={handleMnemonicVisibilityClick} class="absolute top-10 right-10 flex flex-row items-center" type="button">
+                    <button
+                        on:click={handleMnemonicVisibilityClick}
+                        class="absolute top-10 right-10 flex flex-row items-center"
+                        type="button"
+                    >
                         <Text smaller overrideColor classes="text-blue-500 mr-2">
                             {locale(`views.recoveryPhrase.${hide ? 'revealRecoveryPhrase' : 'hideRecoveryPhrase'}`)}
                         </Text>

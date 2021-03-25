@@ -1,9 +1,11 @@
 <script lang="typescript">
+    import { Button, Illustration, OnboardingLayout, Text } from 'shared/components'
     import { createEventDispatcher } from 'svelte'
-    import { OnboardingLayout, Illustration, Text, Button } from 'shared/components'
-    export let locale
-    export let mobile
-    export let busy
+    import type { MessageFormatter } from 'shared/lib/i18n'
+
+    export let locale: MessageFormatter
+    export let mobile: boolean
+    export let busy: boolean
 
     const dispatch = createEventDispatcher()
 

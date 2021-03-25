@@ -1,13 +1,15 @@
 <script lang="typescript">
-    import { Button, Illustration, OnboardingLayout, Password, Spinner, Text } from 'shared/components'
-    import { createEventDispatcher } from 'svelte'
+    import { Button,Illustration,OnboardingLayout,Password,Spinner,Text } from 'shared/components';
+    import { createEventDispatcher } from 'svelte';
+    import type { MessageFormatter } from 'shared/lib/i18n';
 
-    export let locale
-    export let mobile
-    export let strongholdPassword
+
+    export let locale: MessageFormatter
+    export let mobile: boolean
+    export let strongholdPassword: string
     export let busy = false
 
-    let confirmPassword
+    let confirmPassword: string
     let skipping = false
 
     const dispatch = createEventDispatcher()

@@ -7,11 +7,12 @@
     import { getDefaultStrongholdName } from 'shared/lib/utils'
     import { asyncBackup, asyncCreateAccount, asyncStoreMnemonic, requestMnemonic } from 'shared/lib/wallet'
     import { createEventDispatcher } from 'svelte'
+    import type { MessageFormatter } from 'shared/lib/i18n'
     import { get } from 'svelte/store'
-    import { Backup, BackupToFile, RecoveryPhrase, VerifyRecoveryPhrase } from './views/'
+    import { Backup, BackupToFile, RecoveryPhrase, VerifyRecoveryPhrase } from './views'
 
-    export let locale
-    export let mobile
+    export let locale: MessageFormatter
+    export let mobile: boolean
 
     enum BackupState {
         Init = 'init',
@@ -26,8 +27,8 @@
     let stateHistory = []
     let busy = false
 
-    const _next = async (event) => {
-        let nextState
+    const _next = async (event: { detail: { [id: string]: string } }) => {
+        let nextState: BackupState
         let params = event.detail || {}
 
         switch (state) {

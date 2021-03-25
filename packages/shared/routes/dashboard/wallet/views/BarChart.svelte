@@ -2,8 +2,9 @@
     import { Chart, Text } from 'shared/components'
     import { getAccountActivityData } from 'shared/lib/chart'
     import { getContext } from 'svelte'
+    import type { MessageFormatter } from 'shared/lib/i18n'
 
-    export let locale
+    export let locale: MessageFormatter
 
     const selectedAccount = getContext('selectedAccount')
 

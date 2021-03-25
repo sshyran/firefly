@@ -1,11 +1,12 @@
 <script lang="typescript">
-    import { Button, Text, Icon } from 'shared/components'
-    import { getInitials } from 'shared/lib/helpers'
-    import { accountRoute, walletRoute } from 'shared/lib/router'
-    import { AccountRoutes, WalletRoutes } from 'shared/lib/typings/routes'
-    import { selectedAccountId, selectedMessage } from 'shared/lib/wallet'
+    import { Icon,Text } from 'shared/components';
+    import { getInitials } from 'shared/lib/helpers';
+    import { accountRoute,walletRoute } from 'shared/lib/router';
+    import { AccountRoutes,WalletRoutes } from 'shared/lib/typings/routes';
+    import { selectedAccountId,selectedMessage } from 'shared/lib/wallet';
+    import type { MessageFormatter } from 'shared/lib/i18n';
 
-    export let locale
+    export let locale: MessageFormatter
     export let accounts: {
         id: string
         alias: string

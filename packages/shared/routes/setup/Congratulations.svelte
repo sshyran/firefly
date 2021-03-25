@@ -1,10 +1,11 @@
 <script lang="typescript">
-    import { Button, Illustration, OnboardingLayout, Icon, Text } from 'shared/components'
+    import { Button, Icon, Illustration, OnboardingLayout, Text } from 'shared/components'
     import { newProfile, saveProfile, setActiveProfile } from 'shared/lib/profile'
     import { createEventDispatcher, onMount } from 'svelte'
+    import type { MessageFormatter } from 'shared/lib/i18n'
 
-    export let locale
-    export let mobile
+    export let locale: MessageFormatter
+    export let mobile: boolean
 
     onMount(() => {
         // This is the last screen in onboarding for all flows i.e., if you create a new wallet or import stronghold

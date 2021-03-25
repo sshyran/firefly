@@ -3,6 +3,5 @@
     "compilerOptions": {
         "isolatedModules": false,
         "allowJs": true
-    },
-    "include": ["../shared/**/*.ts"]
+    }
 }

@@ -1,10 +1,12 @@
 <script lang="typescript">
+    import { Button, Illustration, OnboardingLayout, Password, Text } from 'shared/components'
+    import type { MessageFormatter } from 'shared/lib/i18n'
     import { createEventDispatcher } from 'svelte'
-    import { OnboardingLayout, Password, Text, Button, Illustration } from 'shared/components'
+    import type { ImportType } from '../import'
 
-    export let locale
-    export let mobile
-    export let importType
+    export let locale: MessageFormatter
+    export let mobile: boolean
+    export let importType: ImportType
     export let error = ''
     export let busy = false
 

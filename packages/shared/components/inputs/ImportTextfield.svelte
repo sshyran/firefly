@@ -3,9 +3,10 @@
     import { debounce } from 'shared/lib/utils'
     import { asyncVerifyMnemonic } from 'shared/lib/wallet'
     import { english } from 'shared/lib/wordlists/english'
+    import type { MessageFormatter } from 'shared/lib/i18n'
 
     export let value = undefined
-    export let locale
+    export let locale: MessageFormatter
 
     let statusMessage = ''
     let content = ''
@@ -83,21 +84,24 @@
     }
 </script>
 
-<style type="text/scss">
-    textarea {
-        min-height: 200px;
-    }
-</style>
-
 <div>
     <textarea
         class="text-14 leading-140 resize-none w-full p-4 pb-3 rounded-xl border border-solid 
-            {error ? 'border-red-300 hover:border-red-500 focus:border-red-500' : 'border-gray-300 hover:border-gray-500 dark:border-gray-700 dark:hover:border-gray-700'} 
+            {error
+            ? 'border-red-300 hover:border-red-500 focus:border-red-500'
+            : 'border-gray-300 hover:border-gray-500 dark:border-gray-700 dark:hover:border-gray-700'} 
             text-gray-500 dark:text-white bg-white dark:bg-gray-800 "
         bind:value={content}
         on:keydown={debounce(handleKeyDown)}
         placeholder=""
         spellcheck={false}
-        autofocus />
+        autofocus
+    />
     <Text type="p" secondary {error}>{statusMessage}&nbsp;</Text>
 </div>
+
+<style type="text/scss">
+    textarea {
+        min-height: 200px;
+    }
+</style>

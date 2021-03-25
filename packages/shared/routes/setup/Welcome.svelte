@@ -3,17 +3,18 @@
     import { appSettings } from 'shared/lib/appSettings'
     import { locales, setLanguage, _ } from 'shared/lib/i18n'
     import { createEventDispatcher } from 'svelte'
+    import type { MessageFormatter } from 'shared/lib/i18n'
 
-    export let locale
-    export let mobile
+    export let locale: MessageFormatter
+    export let mobile: boolean
 
     const dispatch = createEventDispatcher()
 
-    function handleContinueClick() {
+    const handleContinueClick = () => {
         dispatch('next')
     }
 
-    const handleLanguage = (item) => {
+    const handleLanguage = (item: { value: string; label: string }) => {
         setLanguage(item)
         locale = $_
     }
@@ -31,7 +32,8 @@
                 sortItems={true}
                 onSelect={handleLanguage}
                 value={locales[$appSettings.language]}
-                items={Object.values(locales).map((locale) => ({ value: locale, label: locale }))} />
+                items={Object.values(locales).map((locale) => ({ value: locale, label: locale }))}
+            />
         </div>
         <div slot="leftpane__action">
             <Button onClick={() => handleContinueClick()} classes="w-full">{locale('actions.continue')}</Button>

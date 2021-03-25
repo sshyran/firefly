@@ -2,10 +2,11 @@
     import { Button, Icon, OnboardingLayout, RecoveryPhrase, Text } from 'shared/components'
     import { english } from 'shared/lib/wordlists/english'
     import { createEventDispatcher, onMount } from 'svelte'
+    import type { MessageFormatter } from 'shared/lib/i18n'
 
-    export let locale
-    export let mobile
-    export let mnemonic
+    export let locale: MessageFormatter
+    export let mobile: boolean
+    export let mnemonic: string[]
     export let busy = false
 
     let verifyRecoveryPhrase = []
@@ -22,8 +23,8 @@
         wordChoices = [actualWord, random1, random2].sort(() => 0.5 - Math.random())
     }
 
-    const generateRandomWord = (excludeWords) => {
-        let word
+    const generateRandomWord = (excludeWords: string[]): string => {
+        let word: string
 
         do {
             const wordIndex = Math.floor(Math.random() * english.length)
@@ -35,7 +36,7 @@
         return word
     }
 
-    const handleChoice = (word) => {
+    const handleChoice = (word: string) => {
         verifyRecoveryPhrase[verifyIndex] = word
         if (mnemonic[verifyIndex] === word) {
             if (verifyIndex === mnemonic.length - 1) {
@@ -75,7 +76,8 @@
                     <button
                         type="button"
                         class="w-full flex flex-row p-4 mb-4 rounded-2xl border border-1 border-solid items-center justify-between border-gray-300 dark:border-gray-700 hover:border-gray-500 dark:hover:border-gray-700 focus:border-gray-500 dark:focus:border-gray-700"
-                        on:click={() => handleChoice(word)}>
+                        on:click={() => handleChoice(word)}
+                    >
                         <Text smaller classes="ml-3">{word}</Text>
                         <Icon icon="chevron-right" classes="text-gray-800 dark:text-white" />
                     </button>

@@ -2,13 +2,14 @@
     import { Icon, Logo, Profile } from 'shared/components'
     import { profiles, setActiveProfile } from 'shared/lib/profile'
     import { createEventDispatcher } from 'svelte'
+    import type { MessageFormatter } from 'shared/lib/i18n'
 
-    export let locale
-    export let mobile
+    export let locale: MessageFormatter
+    export let mobile: boolean
 
     const dispatch = createEventDispatcher()
 
-    function handleContinueClick(id) {
+    function handleContinueClick(id: string) {
         setActiveProfile(id)
         dispatch('next')
     }
@@ -33,14 +34,16 @@
                         name={profile.name}
                         id={profile.id}
                         isDeveloper={profile.isDeveloperProfile}
-                        classes="cursor-pointer" />
+                        classes="cursor-pointer"
+                    />
                 </div>
             {/each}
             <div class="mb-6">
                 <Profile
                     onClick={addProfile}
                     name={locale('general.addProfile')}
-                    classes="border-solid border-2 border-gray-400 cursor-pointer">
+                    classes="border-solid border-2 border-gray-400 cursor-pointer"
+                >
                     <Icon icon="plus" classes="text-blue-500" />
                 </Profile>
             </div>

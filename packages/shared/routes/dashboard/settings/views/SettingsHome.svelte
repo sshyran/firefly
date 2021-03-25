@@ -12,9 +12,10 @@
         SecuritySettings,
         SettingsRoutes,
     } from 'shared/lib/typings/routes'
+    import type { MessageFormatter } from 'shared/lib/i18n'
 
-    export let locale
-    export let mobile
+    export let locale: MessageFormatter
+    export let mobile: boolean
 </script>
 
 {#if mobile}
@@ -35,7 +36,8 @@
                     settingsRoute.set(SettingsRoutes.GeneralSettings)
                     settingsChildRoute.set(setting)
                 }}
-                {locale} />
+                {locale}
+            />
             <SettingsMenu
                 icon="security"
                 iconColor="bg-yellow-500"
@@ -48,7 +50,8 @@
                     settingsRoute.set(SettingsRoutes.Security)
                     settingsChildRoute.set(setting)
                 }}
-                {locale} />
+                {locale}
+            />
             <SettingsMenu
                 icon="tools"
                 iconColor="bg-green-600"
@@ -61,7 +64,8 @@
                     settingsRoute.set(SettingsRoutes.AdvancedSettings)
                     settingsChildRoute.set(setting)
                 }}
-                {locale} />
+                {locale}
+            />
             <SettingsMenu
                 icon="info"
                 iconColor="bg-purple-500"
@@ -74,7 +78,8 @@
                     settingsRoute.set(SettingsRoutes.HelpAndInfo)
                     settingsChildRoute.set(setting)
                 }}
-                {locale} />
+                {locale}
+            />
         </div>
     </div>
 {/if}

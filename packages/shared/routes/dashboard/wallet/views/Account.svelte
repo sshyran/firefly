@@ -3,10 +3,11 @@
     import type { WalletAccount } from 'shared/lib/wallet'
     import { getAccountMessages } from 'shared/lib/wallet'
     import { getContext } from 'svelte'
+    import type { MessageFormatter } from 'shared/lib/i18n'
     import type { Readable, Writable } from 'svelte/store'
     import { AccountActions, AccountBalance, AccountHistory, AccountNavigation, BarChart, LineChart } from '.'
 
-    export let locale
+    export let locale: MessageFormatter
     export let send
     export let internalTransfer
     export let generateAddress
@@ -37,7 +38,8 @@
                         color={$account.color}
                         balance={$account.balance}
                         balanceEquiv={$account.balanceEquiv}
-                        onMenuClick={handleMenuClick} />
+                        onMenuClick={handleMenuClick}
+                    />
                     <DashboardPane classes="h-full -mt-5 z-0">
                         <AccountActions {isGeneratingAddress} {send} {internalTransfer} {generateAddress} {locale} />
                     </DashboardPane>

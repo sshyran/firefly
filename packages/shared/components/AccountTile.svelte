@@ -1,7 +1,7 @@
 <script lang="typescript">
     import { Text } from 'shared/components'
 
-    export let onClick = () => ''
+    export let onClick: () => void
     export let name = ''
     export let balance = ''
     export let balanceEquiv = ''

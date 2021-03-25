@@ -7,14 +7,15 @@
     import { activeProfile, isStrongholdLocked, profiles } from 'shared/lib/profile'
     import { api } from 'shared/lib/wallet'
     import { onDestroy, onMount } from 'svelte'
+    import type { MessageFormatter } from 'shared/lib/i18n'
     import { get } from 'svelte/store'
 
-    export let locale
+    export let locale: MessageFormatter
 
-    let lastBackupDate
-    let lastBackupDateFormatted
-    let backupSafe
-    let color
+    let lastBackupDate: Date | undefined
+    let lastBackupDateFormatted: { unit: string, value?: number} | undefined
+    let backupSafe: boolean
+    let color: string
 
     function setup() {
         const ap = get(activeProfile)
@@ -25,7 +26,7 @@
         color = getBackupWarningColor(lastBackupDate)
     }
 
-    function handleSecurityTileClick(popupType) {
+    function handleSecurityTileClick(popupType: string) {
         openPopup({
             type: popupType,
             props: {
@@ -63,13 +64,16 @@
         <!-- Stronghold backup -->
         <SecurityTile
             title={locale('views.dashboard.security.strongholdBackup.title')}
-            message={$activeProfile?.lastStrongholdBackupTime ? locale(`dates.${lastBackupDateFormatted.unit}`, {
+            message={$activeProfile?.lastStrongholdBackupTime
+                ? locale(`dates.${lastBackupDateFormatted.unit}`, {
                       values: { time: lastBackupDateFormatted.value },
-                  }) : locale('popups.backup.notBackedUp')}
+                  })
+                : locale('popups.backup.notBackedUp')}
             onClick={() => handleSecurityTileClick('backup')}
             icon="shield"
             warning={!backupSafe}
-            {color} />
+            {color}
+        />
         <!-- Firefly version -->
         <SecurityTile
             title={locale('views.dashboard.security.version.title', { values: { version: $versionDetails.currentVersion } })}
@@ -77,7 +81,8 @@
             color={$versionDetails.upToDate ? 'blue' : 'yellow'}
             warning={!$versionDetails.upToDate}
             icon="firefly"
-            onClick={() => handleSecurityTileClick('version')} />
+            onClick={() => handleSecurityTileClick('version')}
+        />
         <!-- Stronghold status -->
         <SecurityTile
             title={locale('views.dashboard.security.strongholdStatus.title')}
@@ -87,6 +92,7 @@
             onClick={() => ($isStrongholdLocked ? handleSecurityTileClick('password') : lockStronghold())}
             classes="col-span-2"
             toggle
-            toggleActive={!$isStrongholdLocked} />
+            toggleActive={!$isStrongholdLocked}
+        />
     </div>
 </div>

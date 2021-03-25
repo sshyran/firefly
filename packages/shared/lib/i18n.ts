@@ -1,5 +1,6 @@
 import { appSettings } from 'shared/lib/appSettings'
 import { addMessages, dictionary, getLocaleFromNavigator, init, _ } from 'svelte-i18n'
+import type { MessageFormatter } from 'svelte-i18n/types/runtime/types'
 import { derived, get, writable } from 'svelte/store'
 
 /*
@@ -147,8 +148,10 @@ const setLanguage = (item) => {
     setupI18n({ withLocale: locale })
 }
 
-const localize = get(_) as (string, values?) => string
+const localize: MessageFormatter = get(_)
 
 // We expose the svelte-i18n _ store so that our app has
 // a single API for i18n
 export { _, setupI18n, dir, isLocaleLoaded, localize, setLanguage }
+export type { MessageFormatter }
+

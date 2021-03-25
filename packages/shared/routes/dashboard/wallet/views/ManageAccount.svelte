@@ -1,21 +1,22 @@
 <script lang="typescript">
     import { Button, Input, Text } from 'shared/components'
     import { hasOnlyWhitespaces } from 'shared/lib/helpers'
+    import type { MessageFormatter } from 'shared/lib/i18n'
     import { accountRoute, walletRoute } from 'shared/lib/router'
     import { AccountRoutes, WalletRoutes } from 'shared/lib/typings/routes'
-    import { api, MAX_ACCOUNT_NAME_LENGTH, selectedAccountId, wallet, WalletAccount } from 'shared/lib/wallet'
+    import { MAX_ACCOUNT_NAME_LENGTH, selectedAccountId, setAliasAsync, wallet, WalletAccount } from 'shared/lib/wallet'
 
-    export let locale
-    export let alias
+    export let locale: MessageFormatter
+    export let alias: string
     export let error = ''
 
     const { accounts } = $wallet
 
     let accountAlias = alias
-    let isBusy
+    let isBusy = false
     $: isAliasValid = accountAlias && !hasOnlyWhitespaces(accountAlias)
 
-    const handleSaveClick = () => {
+    const handleSaveClick = async () => {
         if (accountAlias) {
             error = ''
             if (accountAlias.length > MAX_ACCOUNT_NAME_LENGTH) {
@@ -28,34 +29,34 @@
             if ($accounts.find((a) => a.alias === accountAlias)) {
                 return (error = locale('error.account.duplicate'))
             }
-            isBusy = true
-            api.setAlias($selectedAccountId, accountAlias, {
-                onSuccess(res) {
-                    accounts.update((_accounts) => {
-                        return _accounts.map((account) => {
-                            if (account.id === $selectedAccountId) {
-                                return Object.assign<WalletAccount, WalletAccount, Partial<WalletAccount>>(
-                                    {} as WalletAccount,
-                                    account,
-                                    {
-                                        alias: accountAlias,
-                                    }
-                                )
-                            }
+            try {
+                isBusy = true
 
-                            return account
-                        })
+                await setAliasAsync($selectedAccountId, accountAlias)
+
+                accounts.update((_accounts) => {
+                    return _accounts.map((account) => {
+                        if (account.id === $selectedAccountId) {
+                            return Object.assign<WalletAccount, WalletAccount, Partial<WalletAccount>>(
+                                {} as WalletAccount,
+                                account,
+                                {
+                                    alias: accountAlias,
+                                }
+                            )
+                        }
+
+                        return account
                     })
+                })
 
-                    isBusy = false
-                    selectedAccountId.set(null)
-                    walletRoute.set(WalletRoutes.Init)
-                },
-                onError(err) {
-                    isBusy = false
-                    error = locale(err.error)
-                },
-            })
+                selectedAccountId.set(null)
+                walletRoute.set(WalletRoutes.Init)
+            } catch (err) {
+                error = locale(err.error)
+            } finally {
+                isBusy = false
+            }
         }
     }
     const handleCancelClick = () => {
@@ -76,7 +77,8 @@
                 placeholder={locale('general.accountName')}
                 autofocus
                 submitHandler={handleSaveClick}
-                disabled={isBusy} />
+                disabled={isBusy}
+            />
         </div>
     </div>
     <!-- Action -->
@@ -85,7 +87,7 @@
     {/if}
     {#if !isBusy}
         <div class="flex flex-row justify-between px-2">
-            <Button secondary classes="-mx-2 w-1/2" onClick={() => handleCancelClick()} disbled={isBusy}>
+            <Button secondary classes="-mx-2 w-1/2" onClick={() => handleCancelClick()} disabled={isBusy}>
                 {locale('actions.cancel')}
             </Button>
             <Button classes="-mx-2 w-1/2" onClick={() => handleSaveClick()} disabled={!isAliasValid || isBusy}>

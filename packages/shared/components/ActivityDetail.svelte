@@ -1,18 +1,19 @@
 <script lang="typescript">
     import { Icon, Text } from 'shared/components'
     import { getInitials, truncateString } from 'shared/lib/helpers'
+    import type { Payload } from 'shared/lib/typings/message'
     import { formatUnit } from 'shared/lib/units'
     import { setClipboard } from 'shared/lib/utils'
     import type { WalletAccount } from 'shared/lib/wallet'
     import { getContext } from 'svelte'
     import { date } from 'svelte-i18n'
+    import type { MessageFormatter } from 'shared/lib/i18n'
     import type { Readable, Writable } from 'svelte/store'
-    import type { Payload } from 'shared/lib/typings/message'
 
     export let id
     export let timestamp
     export let confirmed
-    export let locale
+    export let locale: MessageFormatter
     export let payload: Payload
     export let onBackClick = () => {}
 
@@ -45,11 +46,15 @@
 
 <div class="flex flex-col h-full min-h-0">
     <div
-        class="px-4 pt-7 pb-3.5 mb-5 rounded-xl text-center items-center justify-center flex flex-row bg-gray-100 dark:bg-gray-900 dark:bg-opacity-50 {!confirmed && 'opacity-50'}">
+        class="px-4 pt-7 pb-3.5 mb-5 rounded-xl text-center items-center justify-center flex flex-row bg-gray-100 dark:bg-gray-900 dark:bg-opacity-50 {!confirmed &&
+            'opacity-50'}"
+    >
         <div class="flex flex-col flex-wrap justify-center items-center text-center">
             {#if senderAccount}
                 <div
-                    class="flex items-center justify-center w-8 h-8 rounded-xl p-2 mb-2 text-12 leading-100 font-bold text-center bg-{senderAccount?.color ?? 'blue'}-500 text-white">
+                    class="flex items-center justify-center w-8 h-8 rounded-xl p-2 mb-2 text-12 leading-100 font-bold text-center bg-{senderAccount?.color ??
+                        'blue'}-500 text-white"
+                >
                     {getInitials(senderAccount.alias, 2)}
                 </div>
                 {#if !payload.data.essence.data.incoming}
@@ -65,7 +70,9 @@
         <div class="flex flex-col flex-wrap justify-center items-center text-center">
             {#if receiverAccount}
                 <div
-                    class="flex items-center justify-center w-8 h-8 rounded-xl p-2 mb-2 text-12 leading-100 font-bold bg-{receiverAccount?.color ?? 'blue'}-500 text-white">
+                    class="flex items-center justify-center w-8 h-8 rounded-xl p-2 mb-2 text-12 leading-100 font-bold bg-{receiverAccount?.color ??
+                        'blue'}-500 text-white"
+                >
                     {getInitials(receiverAccount.alias, 2)}
                 </div>
                 {#if payload.data.essence.data.incoming}

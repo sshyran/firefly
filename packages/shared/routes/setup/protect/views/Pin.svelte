@@ -1,26 +1,27 @@
 <script lang="typescript">
-    import { OnboardingLayout, Illustration, Text, Button, Pin } from 'shared/components'
-    import { createEventDispatcher } from 'svelte'
+    import { Button, Illustration, OnboardingLayout, Pin, Text } from 'shared/components'
     import { validatePinFormat } from 'shared/lib/utils'
+    import { createEventDispatcher } from 'svelte'
+    import type { MessageFormatter } from 'shared/lib/i18n'
 
-    export let locale
-    export let mobile
-    export let pinCandidate
+    export let locale: MessageFormatter
+    export let mobile: boolean
+    export let pinCandidate: string
     export let busy = false
 
-    let pinInput
+    let pinInput: string
 
     const dispatch = createEventDispatcher()
 
     $: confirmInput = pinCandidate !== null
     $: valid = !!pinCandidate ? validatePinFormat(pinInput) && pinInput === pinCandidate : validatePinFormat(pinInput)
 
-    function onSubmit() {
+    const onSubmit = () => {
         if (valid) {
             dispatch('next', !confirmInput ? { pinCandidate: pinInput } : null)
         }
     }
-    function handleBackClick() {
+    const handleBackClick = () => {
         dispatch('previous')
     }
 </script>
@@ -40,7 +41,8 @@
                     classes="w-full mx-auto block"
                     on:submit={onSubmit}
                     autofocus
-                    disabled={busy} />
+                    disabled={busy}
+                />
             {:else}
                 <Text type="h2" classes="mb-5">{locale('views.confirmPin.title')}</Text>
                 <Text type="p" secondary classes="mb-4">{locale('views.confirmPin.body1')}</Text>
@@ -51,7 +53,8 @@
                     classes="w-full mx-auto block"
                     on:submit={onSubmit}
                     autofocus
-                    disabled={busy} />
+                    disabled={busy}
+                />
             {/if}
         </div>
         <div slot="leftpane__action" class="flex flex-row flex-wrap justify-between items-center space-x-4">

@@ -7,8 +7,9 @@
     import { addProfileCurrencyPriceData } from 'shared/lib/marketData'
     import { activeProfile, updateProfile } from 'shared/lib/profile'
     import { updateAccountsBalanceEquiv, updateBalanceOverviewFiat } from 'shared/lib/wallet'
+    import type { MessageFormatter } from 'shared/lib/i18n'
 
-    export let locale
+    export let locale: MessageFormatter
 
     let darkModeEnabled = $appSettings.darkMode
     let notificationsChecked = $appSettings.notifications
@@ -48,7 +49,8 @@
             sortItems={true}
             onSelect={handleLanguage}
             value={locales[$appSettings.language]}
-            items={Object.values(locales).map((locale) => ({ value: locale, label: locale }))} />
+            items={Object.values(locales).map((locale) => ({ value: locale, label: locale }))}
+        />
     </section>
     {#if $loggedIn}
         <HR classes="pb-5 mt-5 justify-center" />
@@ -61,7 +63,8 @@
                 value={$activeProfile?.settings.currency}
                 items={Object.keys($exchangeRates)
                     .map((currency) => ({ value: currency, label: currency }))
-                    .sort()} />
+                    .sort()}
+            />
         </section>
     {/if}
     <HR classes="pb-5 mt-5 justify-center" />

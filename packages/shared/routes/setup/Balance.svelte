@@ -1,9 +1,10 @@
 <script lang="typescript">
+    import { Button, Illustration, OnboardingLayout, Text } from 'shared/components'
     import { createEventDispatcher } from 'svelte'
-    import { OnboardingLayout, Illustration, Text, Button } from 'shared/components'
+    import type { MessageFormatter } from 'shared/lib/i18n'
 
-    export let locale
-    export let mobile
+    export let locale: MessageFormatter
+    export let mobile: boolean
 
     const dispatch = createEventDispatcher()
 
@@ -31,7 +32,7 @@
             </balance>
         </div>
         <div slot="leftpane__action" class="flex flex-row justify-between items-center space-x-4">
-            <Button ghost classes="flex-1" onClick={() => console.log('foo')}>{locale('actions.checkAgain')}</Button>
+            <Button classes="flex-1" onClick={() => console.log('foo')}>{locale('actions.checkAgain')}</Button>
             <Button classes="flex-1" onClick={() => handleContinueClick()}>{locale('actions.continue')}</Button>
         </div>
         <div slot="rightpane" class="w-full h-full flex p-16 bg-pastel-yellow dark:bg-gray-900">

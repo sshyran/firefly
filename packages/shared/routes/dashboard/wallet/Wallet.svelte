@@ -3,10 +3,10 @@
     import { clearSendParams } from 'shared/lib/app'
     import { appSettings } from 'shared/lib/appSettings'
     import { deepLinkRequestActive } from 'shared/lib/deepLinking'
+    import type { MessageFormatter } from 'shared/lib/i18n'
     import { priceData } from 'shared/lib/marketData'
     import { DEFAULT_NODE, DEFAULT_NODES, network } from 'shared/lib/network'
     import { showAppNotification } from 'shared/lib/notifications'
-    import { openPopup } from 'shared/lib/popup'
     import { activeProfile, isStrongholdLocked } from 'shared/lib/profile'
     import { resetWalletRoute, walletRoute } from 'shared/lib/router'
     import { WalletRoutes } from 'shared/lib/typings/routes'
@@ -14,28 +14,35 @@
         AccountMessage,
         AccountsBalanceHistory,
         api,
+        asyncCreateAccount,
         BalanceHistory,
         BalanceOverview,
         getAccountMeta,
+        getAccountsAsync,
         getAccountsBalanceHistory,
         getTransactions,
+        getUnusedAddressAsync,
         getWalletBalanceHistory,
         initialiseListeners,
+        internalTransferAsync,
         isTransferring,
         prepareAccountInfo,
         removeEventListeners,
         selectedAccountId,
+        sendAsync,
+        syncAccountAsync,
         syncAccounts,
         transferState,
+        unlockIfRequired,
         updateBalanceOverview,
         wallet,
         WalletAccount,
     } from 'shared/lib/wallet'
     import { onMount, setContext } from 'svelte'
     import { derived, Readable, Writable } from 'svelte/store'
-    import { Account, CreateAccount, LineChart, Security, WalletActions, WalletBalance, WalletHistory } from './views/'
+    import { Account, CreateAccount, LineChart, Security, WalletActions, WalletBalance, WalletHistory } from './views'
 
-    export let locale
+    export let locale: MessageFormatter
 
     const { accounts, balanceOverview, accountsLoaded } = $wallet
 
@@ -62,58 +69,45 @@
 
     let isGeneratingAddress = false
 
-    function getAccounts() {
-        api.getAccounts({
-            onSuccess(accountsResponse) {
-                const _continue = () => {
-                    accountsLoaded.set(true)
-                    syncAccounts()
-                }
+    async function getAccounts() {
+        try {
+            const accountsResponse = await getAccountsAsync()
 
-                if (accountsResponse.payload.length === 0) {
-                    _continue()
-                } else {
-                    const totalBalance = {
-                        balance: 0,
-                        incoming: 0,
-                        outgoing: 0,
-                    }
+            const totalBalance = {
+                balance: 0,
+                incoming: 0,
+                outgoing: 0,
+            }
 
-                    for (const [idx, storedAccount] of accountsResponse.payload.entries()) {
-                        getAccountMeta(storedAccount.id, (err, meta) => {
-                            if (!err) {
-                                totalBalance.balance += meta.balance
-                                totalBalance.incoming += meta.incoming
-                                totalBalance.outgoing += meta.outgoing
+            for (const storedAccount of accountsResponse.payload) {
+                const meta = await getAccountMeta(storedAccount.id)
+                totalBalance.balance += meta.balance
+                totalBalance.incoming += meta.incoming
+                totalBalance.outgoing += meta.outgoing
 
-                                const account = prepareAccountInfo(storedAccount, meta)
-                                accounts.update((accounts) => [...accounts, account])
+                const account = prepareAccountInfo(storedAccount, meta)
+                accounts.update((accounts) => [...accounts, account])
+            }
 
-                                if (idx === accountsResponse.payload.length - 1) {
-                                    updateBalanceOverview(totalBalance.balance, totalBalance.incoming, totalBalance.outgoing)
-                                    _continue()
-                                }
-                            } else {
-                                console.error(err)
-                            }
-                        })
-                    }
-                }
-            },
-            onError(err) {
-                showAppNotification({
-                    type: 'error',
-                    message: locale(err.error),
-                })
-            },
-        })
+            updateBalanceOverview(totalBalance.balance, totalBalance.incoming, totalBalance.outgoing)
+
+            accountsLoaded.set(true)
+            await syncAccounts()
+        } catch (err) {
+            showAppNotification({
+                type: 'error',
+                message: locale(err.error),
+            })
+        }
     }
 
-    function onGenerateAddress(accountId) {
-        const _generate = () => {
-            isGeneratingAddress = true
-            api.getUnusedAddress(accountId, {
-                onSuccess(response) {
+    async function onGenerateAddress(accountId: string) {
+        await unlockIfRequired(async (cancelled) => {
+            try {
+                if (!cancelled) {
+                    isGeneratingAddress = true
+
+                    const response = await getUnusedAddressAsync(accountId)
                     accounts.update((accounts) =>
                         accounts.map((account) => {
                             if (account.id === accountId) {
@@ -129,185 +123,129 @@
                             return account
                         })
                     )
-                    isGeneratingAddress = false
-                },
-                onError(err) {
-                    isGeneratingAddress = false
+                }
+            } catch (err) {
+                showAppNotification({
+                    type: 'error',
+                    message: locale(err.error),
+                })
+            } finally {
+                isGeneratingAddress = false
+            }
+        })
+    }
+
+    async function onCreateAccount(alias: string) {
+        await unlockIfRequired(async (cancelled) => {
+            if (!cancelled) {
+                try {
+                    const createAccountResponse = await asyncCreateAccount({
+                        alias,
+                        signerType: { type: 'Stronghold' },
+                        clientOptions: {
+                            node: $accounts.length > 0 ? $accounts[0].clientOptions.node : DEFAULT_NODE,
+                            nodes: $accounts.length > 0 ? $accounts[0].clientOptions.nodes : DEFAULT_NODES,
+                            // For subsequent accounts, use the network for any of the previous accounts
+                            network: $accounts.length > 0 ? $accounts[0].clientOptions.network : $network,
+                        },
+                    })
+
+                    const account: WalletAccount = prepareAccountInfo(createAccountResponse.payload, {
+                        balance: 0,
+                        incoming: 0,
+                        outgoing: 0,
+                        depositAddress: createAccountResponse.payload.addresses[0].address,
+                    })
+                    // immediately store the account; we update it later after sync
+                    // we do this to allow offline account creation
+                    accounts.update((accounts) => [...accounts, account])
+
+                    try {
+                        await syncAccountAsync(createAccountResponse.payload.id)
+
+                        const meta = await getAccountMeta(createAccountResponse.payload.id)
+                        const account = prepareAccountInfo(createAccountResponse.payload, meta)
+
+                        accounts.update((storedAccounts) => {
+                            return storedAccounts.map((storedAccount) => {
+                                if (storedAccount.id === account.id) {
+                                    return account
+                                }
+                                return storedAccount
+                            })
+                        })
+                    } catch {
+                        // we ignore sync errors since the user can recover from it later
+                        // this allows an account to be created by an offline user
+                    }
+                } catch (err) {
                     showAppNotification({
                         type: 'error',
                         message: locale(err.error),
                     })
-                },
-            })
-        }
-
-        api.getStrongholdStatus({
-            onSuccess(strongholdStatusResponse) {
-                if (strongholdStatusResponse.payload.snapshot.status === 'Locked') {
-                    openPopup({ type: 'password', props: { onSuccess: _generate } })
-                } else {
-                    _generate()
+                } finally {
+                    walletRoute.set(WalletRoutes.Init)
                 }
-            },
-            onError(err) {
-                showAppNotification({
-                    type: 'error',
-                    message: locale(err.error),
-                })
-            },
+            }
         })
     }
 
-    function onCreateAccount(alias, completeCallback) {
-        const _create = () =>
-            api.createAccount(
-                {
-                    alias,
-                    signerType: { type: 'Stronghold' },
-                    clientOptions: {
-                        node: $accounts.length > 0 ? $accounts[0].clientOptions.node : DEFAULT_NODE,
-                        nodes: $accounts.length > 0 ? $accounts[0].clientOptions.nodes : DEFAULT_NODES,
-                        // For subsequent accounts, use the network for any of the previous accounts
-                        network: $accounts.length > 0 ? $accounts[0].clientOptions.network : $network,
-                    },
-                },
-                {
-                    onSuccess(createAccountResponse) {
-                        const account: WalletAccount = prepareAccountInfo(createAccountResponse.payload, {
-                            balance: 0,
-                            incoming: 0,
-                            outgoing: 0,
-                            depositAddress: createAccountResponse.payload.addresses[0].address,
-                        })
-                        // immediately store the account; we update it later after sync
-                        // we do this to allow offline account creation
-                        accounts.update((accounts) => [...accounts, account])
-                        return new Promise((resolve) => {
-                            api.syncAccount(createAccountResponse.payload.id, {
-                                onSuccess(_syncAccountResponse) {
-                                    getAccountMeta(createAccountResponse.payload.id, (err, meta) => {
-                                        if (!err) {
-                                            const account = prepareAccountInfo(createAccountResponse.payload, meta)
-                                            accounts.update((storedAccounts) => {
-                                                return storedAccounts.map((storedAccount) => {
-                                                    if (storedAccount.id === account.id) {
-                                                        return account
-                                                    }
-                                                    return storedAccount
-                                                })
-                                            })
-                                        }
-                                        resolve(null)
-                                    })
-                                },
-                                onError() {
-                                    // we ignore sync errors since the user can recover from it later
-                                    // this allows an account to be created by an offline user
-                                    resolve(null)
-                                },
-                            })
-                        }).then(() => {
-                            walletRoute.set(WalletRoutes.Init)
-                            completeCallback()
-                        })
-                    },
-                    onError(err) {
-                        completeCallback(locale(err.error))
-                    },
-                }
-            )
+    async function onSend(senderAccountId: string, receiveAddress: string, amount: number) {
+        await unlockIfRequired(async (cancelled) => {
+            if (!cancelled) {
+                try {
+                    isTransferring.set(true)
 
-        api.getStrongholdStatus({
-            onSuccess(strongholdStatusResponse) {
-                if (strongholdStatusResponse.payload.snapshot.status === 'Locked') {
-                    openPopup({ type: 'password', props: { onSuccess: _create, onCancelled: completeCallback } })
-                } else {
-                    _create()
-                }
-            },
-            onError(err) {
-                completeCallback(locale(err.error))
-            },
-        })
-    }
-
-    function onSend(senderAccountId, receiveAddress, amount) {
-        const _send = () => {
-            isTransferring.set(true)
-            api.send(
-                senderAccountId,
-                {
-                    amount,
-                    address: receiveAddress,
-                    remainder_value_strategy: {
-                        strategy: 'ChangeAddress',
-                    },
-                    indexation: { index: 'firefly', data: new Array() },
-                },
-                {
-                    onSuccess(response) {
-                        accounts.update((_accounts) => {
-                            return _accounts.map((_account) => {
-                                if (_account.id === senderAccountId) {
-                                    return Object.assign<WalletAccount, WalletAccount, Partial<WalletAccount>>(
-                                        {} as WalletAccount,
-                                        _account,
-                                        {
-                                            messages: [response.payload, ..._account.messages],
-                                        }
-                                    )
-                                }
-
-                                return _account
-                            })
-                        })
-
-                        transferState.set('Complete')
-
-                        setTimeout(() => {
-                            clearSendParams()
-                            isTransferring.set(false)
-                            resetWalletRoute()
-                        }, 3000)
-                    },
-                    onError(err) {
-                        isTransferring.set(false)
-                        showAppNotification({
-                            type: 'error',
-                            message: locale(err.error),
-                        })
-                    },
-                }
-            )
-        }
-
-        api.getStrongholdStatus({
-            onSuccess(strongholdStatusResponse) {
-                if (strongholdStatusResponse.payload.snapshot.status === 'Locked') {
-                    openPopup({
-                        type: 'password',
-                        props: {
-                            onSuccess: _send,
+                    const response = await sendAsync(senderAccountId, {
+                        amount,
+                        address: receiveAddress,
+                        remainder_value_strategy: {
+                            strategy: 'ChangeAddress',
                         },
+                        indexation: { index: 'firefly', data: new Array() },
                     })
-                } else {
-                    _send()
+
+                    accounts.update((_accounts) => {
+                        return _accounts.map((_account) => {
+                            if (_account.id === senderAccountId) {
+                                return Object.assign<WalletAccount, WalletAccount, Partial<WalletAccount>>(
+                                    {} as WalletAccount,
+                                    _account,
+                                    {
+                                        messages: [response.payload, ..._account.messages],
+                                    }
+                                )
+                            }
+
+                            return _account
+                        })
+                    })
+
+                    transferState.set('Complete')
+
+                    setTimeout(() => {
+                        clearSendParams()
+                        isTransferring.set(false)
+                        resetWalletRoute()
+                    }, 3000)
+                } catch (err) {
+                    showAppNotification({
+                        type: 'error',
+                        message: locale(err.error),
+                    })
                 }
-            },
-            onError(err) {
-                showAppNotification({
-                    type: 'error',
-                    message: locale(err.error),
-                })
-            },
+            }
+            isTransferring.set(false)
         })
     }
 
-    function onInternalTransfer(senderAccountId, receiverAccountId, amount) {
-        const _internalTransfer = () => {
-            isTransferring.set(true)
-            api.internalTransfer(senderAccountId, receiverAccountId, amount, {
-                onSuccess(response) {
+    async function onInternalTransfer(senderAccountId: string, receiverAccountId: string, amount: number) {
+        await unlockIfRequired(async (cancelled) => {
+            if (!cancelled) {
+                try {
+                    isTransferring.set(true)
+
+                    const response = await internalTransferAsync(senderAccountId, receiverAccountId, amount)
                     const message = response.payload
 
                     accounts.update((_accounts) => {
@@ -348,31 +286,14 @@
                         isTransferring.set(false)
                         resetWalletRoute()
                     }, 3000)
-                },
-                onError(err) {
-                    isTransferring.set(false)
+                } catch (err) {
                     showAppNotification({
                         type: 'error',
                         message: locale(err.error),
                     })
-                },
-            })
-        }
-
-        api.getStrongholdStatus({
-            onSuccess(strongholdStatusResponse) {
-                if (strongholdStatusResponse.payload.snapshot.status === 'Locked') {
-                    openPopup({ type: 'password', props: { onSuccess: _internalTransfer } })
-                } else {
-                    _internalTransfer()
                 }
-            },
-            onError(err) {
-                showAppNotification({
-                    type: 'error',
-                    message: locale(err.error),
-                })
-            },
+            }
+            isTransferring.set(false)
         })
     }
 
@@ -403,19 +324,14 @@
     })
 </script>
 
-<style type="text/scss">
-    :global(body.platform-win32) .wallet-wrapper {
-        @apply pt-0;
-    }
-</style>
-
 {#if $walletRoute === WalletRoutes.Account && $selectedAccountId}
     <Account
         {isGeneratingAddress}
         send={onSend}
         internalTransfer={onInternalTransfer}
         generateAddress={onGenerateAddress}
-        {locale} />
+        {locale}
+    />
 {:else}
     <div class="wallet-wrapper w-full h-full flex flex-col p-10 flex-1 bg-gray-50 dark:bg-gray-900">
         <div class="w-full h-full grid grid-cols-3 gap-x-4 min-h-0">
@@ -432,7 +348,8 @@
                                 send={onSend}
                                 internalTransfer={onInternalTransfer}
                                 generateAddress={onGenerateAddress}
-                                {locale} />
+                                {locale}
+                            />
                         </DashboardPane>
                     {/if}
                 </div>
@@ -453,3 +370,9 @@
         </div>
     </div>
 {/if}
+
+<style type="text/scss">
+    :global(body.platform-win32) .wallet-wrapper {
+        @apply pt-0;
+    }
+</style>

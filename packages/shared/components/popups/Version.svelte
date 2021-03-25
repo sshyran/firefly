@@ -1,11 +1,11 @@
 <script lang="typescript">
-    import { date } from 'svelte-i18n'
+    import { Button, Logo, Text } from 'shared/components'
+    import { updateBusy, updateDownload, versionDetails } from 'shared/lib/appUpdater'
     import { closePopup } from 'shared/lib/popup'
-    import { Text, Button, Logo } from 'shared/components'
+    import { date } from 'svelte-i18n'
+    import type { MessageFormatter } from 'shared/lib/i18n'
 
-    import { versionDetails, updateDownload, updateBusy } from 'shared/lib/appUpdater'
-
-    export let locale
+    export let locale: MessageFormatter
 
     function handleDownload() {
         updateDownload()
@@ -15,15 +15,6 @@
         closePopup()
     }
 </script>
-
-<style type="text/scss">
-    img {
-        width: 196px;
-    }
-    .changelog {
-        max-height: 50vh;
-    }
-</style>
 
 <Text type="h4" classes="mb-5">{locale('popups.version.title', { values: { version: $versionDetails.currentVersion } })}</Text>
 <div class="flex w-full flex-row flex-wrap">
@@ -65,3 +56,12 @@
         </div>
     {/if}
 </div>
+
+<style type="text/scss">
+    img {
+        width: 196px;
+    }
+    .changelog {
+        max-height: 50vh;
+    }
+</style>

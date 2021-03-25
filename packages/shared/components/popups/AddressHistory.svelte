@@ -1,7 +1,9 @@
 <script lang="typescript">
-    import { Text } from 'shared/components'
+    import { Text } from 'shared/components';
+    import type { MessageFormatter } from 'shared/lib/i18n';
 
-    export let locale
+
+    export let locale: MessageFormatter
     export let account
 
     const dummyAddressHistory = [
