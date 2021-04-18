@@ -1,11 +1,11 @@
 <script lang="typescript">
     import { Icon, Text } from 'shared/components'
     import { truncateString } from 'shared/lib/helpers'
+    import { formatDate } from 'shared/lib/i18n'
     import type { Payload } from 'shared/lib/typings/message'
-    import { formatUnit } from 'shared/lib/units'
+    import { formatUnitBestMatch } from 'shared/lib/units'
     import type { WalletAccount } from 'shared/lib/wallet'
     import { getContext } from 'svelte'
-    import { date } from 'svelte-i18n'
     import type { Writable } from 'svelte/store'
 
     const accounts = getContext<Writable<WalletAccount[]>>('walletAccounts')
@@ -27,7 +27,7 @@
 
     const getMessageValue = () => {
         if (cachedMigrationTx) {
-            return formatUnit(balance)
+            return formatUnitBestMatch(balance)
         }
         if (milestoneMessage) {
             const funds = payload.data.essence.receipt.data.funds
@@ -39,9 +39,9 @@
                 .filter((fund) => firstAccountAddresses.includes(fund.output.address))
                 .reduce((acc, fund) => acc + fund.output.amount, 0)
 
-            return formatUnit(totalValue)
+            return formatUnitBestMatch(totalValue)
         }
-        return `${!payload.data.essence.data.incoming ? '-' : ''}${formatUnit(payload.data.essence.data.value)}`
+        return `${!payload.data.essence.data.incoming ? '-' : ''}${formatUnitBestMatch(payload.data.essence.data.value)}`
     }
 
     export let onClick = () => {}
@@ -66,13 +66,12 @@
             {cachedMigrationTx || milestoneMessage ? locale('general.fundMigration') : truncateString(id)}
         </Text>
         <p class="text-10 leading-120 text-gray-500">
-            {$date(new Date(timestamp), {
+            {formatDate(new Date(timestamp), {
                 year: 'numeric',
                 month: 'short',
                 day: 'numeric',
                 hour: 'numeric',
                 minute: 'numeric',
-                hour12: false,
             })}
         </p>
     </div>

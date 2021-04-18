@@ -1,5 +1,5 @@
 import { mnemonic } from 'shared/lib/app'
-import { convertToFiat, currencies, CurrencyTypes, exchangeRates } from 'shared/lib/currency'
+import { convertToFiat, currencies, CurrencyTypes, exchangeRates, formatCurrency } from 'shared/lib/currency'
 import { stripTrailingSlash } from 'shared/lib/helpers'
 import { localize } from 'shared/lib/i18n'
 import type { PriceData } from 'shared/lib/marketData'
@@ -22,7 +22,7 @@ import type {
     MigrationProgressEventPayload
 } from 'shared/lib/typings/events'
 import type { Message, Payload } from 'shared/lib/typings/message'
-import { formatUnit } from 'shared/lib/units'
+import { formatUnitBestMatch } from 'shared/lib/units'
 import { get, writable, Writable } from 'svelte/store'
 import type { ClientOptions } from './typings/client'
 import type { MigrationData, MigrationBundle, SendMigrationBundleResponse } from 'shared/lib/typings/migration'
@@ -111,7 +111,7 @@ export const wallet = writable<WalletState>({
         outgoingRaw: 0,
         balance: '0 Mi',
         balanceRaw: 0,
-        balanceFiat: '0.00 USD',
+        balanceFiat: '$ 0.00',
     }),
     accounts: writable<WalletAccount[]>([]),
     accountsLoaded: writable<boolean>(false),
@@ -132,7 +132,7 @@ export const resetWallet = () => {
         outgoingRaw: 0,
         balance: '0 Mi',
         balanceRaw: 0,
-        balanceFiat: '0.00 USD',
+        balanceFiat: '$ 0.00',
     })
     accounts.set([])
     accountsLoaded.set(false)
@@ -494,7 +494,7 @@ export const initialiseListeners = () => {
                     saveNewMessage(response.payload.accountId, response.payload.message);
 
                     const notificationMessage = localize('notifications.valueTx')
-                        .replace('{{value}}', formatUnit(message.payload.data.essence.data.value))
+                        .replace('{{value}}', formatUnitBestMatch(message.payload.data.essence.data.value))
                         .replace('{{account}}', account.alias);
 
                     showSystemNotification({ type: "info", message: notificationMessage, contextData: { type: "valueTx", accountId: account.id } });
@@ -571,7 +571,7 @@ export const initialiseListeners = () => {
                         if (message.payload.type === 'Transaction') {
                             if (accountTo) {
                                 notificationMessage = localize(`notifications.${messageKey}Internal`)
-                                    .replace('{{value}}', formatUnit(message.payload.data.essence.data.value))
+                                    .replace('{{value}}', formatUnitBestMatch(message.payload.data.essence.data.value))
                                     .replace('{{senderAccount}}', account1.alias)
                                     .replace('{{receiverAccount}}', accountTo)
                             } else {
@@ -581,10 +581,10 @@ export const initialiseListeners = () => {
                                     // out before an internal transfer completed so the internalTransfersInProgress
                                     // was wiped, display the anonymous account message instead
                                     notificationMessage = localize(`notifications.confirmedInternalNoAccounts`)
-                                        .replace('{{value}}', formatUnit(message.payload.data.essence.data.value))
+                                        .replace('{{value}}', formatUnitBestMatch(message.payload.data.essence.data.value))
                                 } else {
                                     notificationMessage = localize(`notifications.${messageKey}`)
-                                        .replace('{{value}}', formatUnit(message.payload.data.essence.data.value))
+                                        .replace('{{value}}', formatUnitBestMatch(message.payload.data.essence.data.value))
                                         .replace('{{account}}', account1.alias)
                                 }
                             }
@@ -716,12 +716,12 @@ export const updateAccountAfterBalanceChange = (
 
                 return Object.assign<WalletAccount, Partial<WalletAccount>>(storedAccount, {
                     rawIotaBalance,
-                    balance: formatUnit(rawIotaBalance, 2),
-                    balanceEquiv: `${convertToFiat(
+                    balance: formatUnitBestMatch(rawIotaBalance),
+                    balanceEquiv: formatCurrency(convertToFiat(
                         rawIotaBalance,
                         get(currencies)[CurrencyTypes.USD],
                         get(exchangeRates)[activeCurrency]
-                    )} ${activeCurrency}`,
+                    )),
                     addresses: storedAccount.addresses.map((_address: Address) => {
                         if (_address.address === address) {
                             _address.balance += receivedBalance - spentBalance
@@ -894,17 +894,17 @@ export const updateBalanceOverview = (balance: number, incoming: number, outgoin
 
     balanceOverview.update((overview) => {
         return Object.assign<BalanceOverview, BalanceOverview, Partial<BalanceOverview>>({} as BalanceOverview, overview, {
-            incoming: formatUnit(incoming, 2),
+            incoming: formatUnitBestMatch(incoming),
             incomingRaw: incoming,
-            outgoing: formatUnit(outgoing, 2),
+            outgoing: formatUnitBestMatch(outgoing),
             outgoingRaw: outgoing,
-            balance: formatUnit(balance, 2),
+            balance: formatUnitBestMatch(balance),
             balanceRaw: balance,
-            balanceFiat: `${convertToFiat(
+            balanceFiat: formatCurrency(convertToFiat(
                 balance,
                 get(currencies)[CurrencyTypes.USD],
                 get(exchangeRates)[activeCurrency]
-            )} ${activeCurrency}`,
+            )),
         });
     });
 };
@@ -912,24 +912,14 @@ export const updateBalanceOverview = (balance: number, incoming: number, outgoin
 /**
  * Updates balance overview fiat value
  *
- * @method updateBalanceOverviewFiat
+ * @method refreshBalanceOverview
  *
  * @returns {void}
  */
-export const updateBalanceOverviewFiat = (): void => {
+export const refreshBalanceOverview = (): void => {
     const { balanceOverview } = get(wallet);
-
-    const activeCurrency = get(activeProfile)?.settings.currency ?? CurrencyTypes.USD;
-
-    balanceOverview.update((overview) => {
-        return Object.assign<BalanceOverview, BalanceOverview, Partial<BalanceOverview>>({} as BalanceOverview, overview, {
-            balanceFiat: `${convertToFiat(
-                overview.balanceRaw,
-                get(currencies)[CurrencyTypes.USD],
-                get(exchangeRates)[activeCurrency]
-            )} ${activeCurrency}`,
-        });
-    });
+    const bo = get(balanceOverview)
+    updateBalanceOverview(bo.balanceRaw, bo.incomingRaw, bo.outgoingRaw)
 }
 
 /**
@@ -1053,15 +1043,15 @@ export const updateAccountsBalanceEquiv = (): void => {
     const activeCurrency = get(activeProfile)?.settings.currency ?? CurrencyTypes.USD;
 
     accounts.update((storedAccounts) => {
-        return storedAccounts.map((storedAccount) => {
-            return Object.assign<WalletAccount, WalletAccount, Partial<WalletAccount>>({} as WalletAccount, storedAccount, {
-                balanceEquiv: `${convertToFiat(
+        for (const storedAccount of storedAccounts) {
+            storedAccount.balance = formatUnitBestMatch(storedAccount.rawIotaBalance)
+            storedAccount.balanceEquiv = formatCurrency(convertToFiat(
                     storedAccount.rawIotaBalance,
                     get(currencies)[CurrencyTypes.USD],
                     get(exchangeRates)[activeCurrency]
-                )} ${activeCurrency}`,
-            })
-        })
+                ))
+        }
+        return storedAccounts
     })
 }
 
@@ -1255,12 +1245,12 @@ export const prepareAccountInfo = (
         depositAddress,
         alias,
         rawIotaBalance: balance,
-        balance: formatUnit(balance, 2),
-        balanceEquiv: `${convertToFiat(
+        balance: formatUnitBestMatch(balance),
+        balanceEquiv: formatCurrency(convertToFiat(
             balance,
             get(currencies)[CurrencyTypes.USD],
             get(exchangeRates)[activeCurrency]
-        )} ${activeCurrency}`,
+        )),
         color: ACCOUNT_COLORS[index % ACCOUNT_COLORS.length],
     })
 }
