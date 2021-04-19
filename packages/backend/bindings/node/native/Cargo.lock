@@ -1802,7 +1802,7 @@ dependencies = [
 [[package]]
 name = "iota-stronghold"
 version = "0.3.0"
-source = "git+https://github.com/iotaledger/stronghold.rs?rev=ab6fea59a81c9ad84e8bd79d482833dc3df249c8#ab6fea59a81c9ad84e8bd79d482833dc3df249c8"
+source = "git+https://github.com/iotaledger/stronghold.rs?branch=temp/old-version#b91ff787bd311cef340a8dd1848b99580a1c925d"
 dependencies = [
  "anyhow",
  "bincode",
@@ -1820,7 +1820,7 @@ dependencies = [
 [[package]]
 name = "iota-wallet"
 version = "0.1.0"
-source = "git+https://github.com/iotaledger/wallet.rs?branch=develop#67f4fe0f2207d43830f52591c39f8546946c15e1"
+source = "git+https://github.com/iotaledger/wallet.rs?branch=temp/old-stronghold-version#b8f45f17e7ba1f873d9efcaf4f558a5e255b682f"
 dependencies = [
  "async-trait",
  "backtrace",
@@ -3049,7 +3049,7 @@ dependencies = [
 [[package]]
 name = "runtime"
 version = "0.3.0"
-source = "git+https://github.com/iotaledger/stronghold.rs?rev=ab6fea59a81c9ad84e8bd79d482833dc3df249c8#ab6fea59a81c9ad84e8bd79d482833dc3df249c8"
+source = "git+https://github.com/iotaledger/stronghold.rs?branch=temp/old-version#b91ff787bd311cef340a8dd1848b99580a1c925d"
 dependencies = [
  "libsodium-sys",
  "serde 1.0.125",
@@ -3389,7 +3389,7 @@ checksum = "fe0f37c9e8f3c5a4a66ad655a93c74daac4ad00c441533bf5c6e7990bb42604e"
 [[package]]
 name = "snapshot"
 version = "0.3.0"
-source = "git+https://github.com/iotaledger/stronghold.rs?rev=ab6fea59a81c9ad84e8bd79d482833dc3df249c8#ab6fea59a81c9ad84e8bd79d482833dc3df249c8"
+source = "git+https://github.com/iotaledger/stronghold.rs?branch=temp/old-version#b91ff787bd311cef340a8dd1848b99580a1c925d"
 dependencies = [
  "dirs-next",
  "hex",
@@ -3422,7 +3422,7 @@ checksum = "a2eb9349b6444b326872e140eb1cf5e7c522154d69e7a0ffb0fb81c06b37543f"
 [[package]]
 name = "store"
 version = "0.3.0"
-source = "git+https://github.com/iotaledger/stronghold.rs?rev=ab6fea59a81c9ad84e8bd79d482833dc3df249c8#ab6fea59a81c9ad84e8bd79d482833dc3df249c8"
+source = "git+https://github.com/iotaledger/stronghold.rs?branch=temp/old-version#b91ff787bd311cef340a8dd1848b99580a1c925d"
 dependencies = [
  "once_cell",
  "paste",
@@ -3432,7 +3432,7 @@ dependencies = [
 [[package]]
 name = "stronghold-engine"
 version = "0.3.0"
-source = "git+https://github.com/iotaledger/stronghold.rs?rev=ab6fea59a81c9ad84e8bd79d482833dc3df249c8#ab6fea59a81c9ad84e8bd79d482833dc3df249c8"
+source = "git+https://github.com/iotaledger/stronghold.rs?branch=temp/old-version#b91ff787bd311cef340a8dd1848b99580a1c925d"
 dependencies = [
  "runtime",
  "snapshot",
@@ -3443,7 +3443,7 @@ dependencies = [
 [[package]]
 name = "stronghold-utils"
 version = "0.2.0"
-source = "git+https://github.com/iotaledger/stronghold.rs?rev=ab6fea59a81c9ad84e8bd79d482833dc3df249c8#ab6fea59a81c9ad84e8bd79d482833dc3df249c8"
+source = "git+https://github.com/iotaledger/stronghold.rs?branch=temp/old-version#b91ff787bd311cef340a8dd1848b99580a1c925d"
 dependencies = [
  "futures",
  "rand 0.8.3",
@@ -3814,7 +3814,7 @@ dependencies = [
 [[package]]
 name = "vault"
 version = "0.3.0"
-source = "git+https://github.com/iotaledger/stronghold.rs?rev=ab6fea59a81c9ad84e8bd79d482833dc3df249c8#ab6fea59a81c9ad84e8bd79d482833dc3df249c8"
+source = "git+https://github.com/iotaledger/stronghold.rs?branch=temp/old-version#b91ff787bd311cef340a8dd1848b99580a1c925d"
 dependencies = [
  "anyhow",
  "iota-crypto 0.5.0",
