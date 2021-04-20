@@ -1,8 +1,9 @@
 <script lang="typescript">
-    import { createEventDispatcher } from 'svelte'
+    import { createEventDispatcher, onMount } from 'svelte'
     import { Transition } from 'shared/components'
+    import { checkChrysalisSnapshot } from 'shared/libs/migration'
     import { SelectProfile, EnterPin } from './views/'
-
+    
     export let locale
     export let mobile
 
@@ -47,6 +48,8 @@
             dispatch('previous')
         }
     }
+
+    onMount(() => checkChrysalisSnapshot())
 </script>
 
 {#if state === LoginState.Init}
