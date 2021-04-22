@@ -15,9 +15,20 @@ jobs:
   build:
     runs-on: ${{ matrix.os }}
     strategy:
-      matrix:
-        os: [ubuntu-18.04, macos-latest, windows-latest]
       fail-fast: false
+      matrix:
+        include:
+          - id: ubuntu-18.04-x86
+            os: ubuntu-18.04
+          - id: macos-latest-x86
+            os: macos-latest
+          - id: macos-latest-arm64
+            os: macos-latest
+          - id: windows-latest-x86
+            os: windows-latest
+          - id: windows-latest-arm64
+            os: windows-latest
+          
 
     steps:
     - uses: actions/checkout@v2
