@@ -1,0 +1,30 @@
+name: Fossa License Scan
+
+on:
+  push:
+    branches:
+      - develop
+      - feature/ci-fossa-scan
+
+jobs:
+  fossa:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v1
+      with:
+        node-version: 12.x
+
+    - name: Install Rust toolchain
+      uses: actions-rs/toolchain@v1
+      with:
+        toolchain: stable
+        profile: minimal
+    
+    - name: License scan
+      uses: fossas/fossa-action@v1
+      with:
+        api-key: ${{ secrets.FOSSA_API_KEY }}
