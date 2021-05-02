@@ -6,6 +6,7 @@ cli:
   server: https://app.fossa.com
   fetcher: custom
   project: firefly
+  locator: "git+github.com/iotaledger/firefly"
 analyze:
   modules:
   - name: Yarn
