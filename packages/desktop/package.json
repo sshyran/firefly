@@ -9,6 +9,7 @@
     "license": "Apache-2.0",
     "scripts": {
         "start": "npm-run-all -p start:dev start:electron",
+        "postinstall": "electron-builder install-app-deps",
         "start:dev": "cross-env NODE_ENV=development webpack serve --content-base public",
         "start:electron": "cross-env NODE_ENV=development electron public/build/main.js",
         "start:electron-prod": "cross-env NODE_ENV=production electron public/build/main.js",
@@ -18,9 +19,11 @@
         "compile:win": "electron-builder --win --x64"
     },
     "dependencies": {
+        "@ledgerhq/hw-transport-node-hid": "^5.51.1",
         "argon2": "^0.27.1",
         "electron-log": "^4.3.1",
         "electron-updater": "^4.3.5",
+        "hw-app-iota": "^0.6.2",
         "kdbxweb": "^1.14.4",
         "keytar": "^7.3.0",
         "shared": "0.0.0",

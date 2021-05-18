@@ -30,6 +30,7 @@ try {
     const kdbx = require('./lib/kdbx')
     const { proxyApi } = require('shared/lib/shell/walletApi')
     const { hookErrorLogger } = require('shared/lib/shell/errorLogger')
+    const ledger = require('./lib/Ledger')
 
     let activeProfileId = null
 
@@ -37,7 +38,7 @@ try {
     Wallet.api = proxyApi(() => activeProfileId)
 
     const eventListeners = {}
-
+    
     const Electron = {
         updateActiveProfile(id) {
             activeProfileId = id
@@ -319,7 +320,7 @@ try {
          * Hook the logger
          * @returns 
          */
-        hookErrorLogger
+        hookErrorLogger,
     }
 
     contextBridge.exposeInMainWorld('__WALLET_INIT__', {
