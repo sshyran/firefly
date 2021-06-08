@@ -1,14 +1,16 @@
 <script lang="typescript">
     import { Animation, Button, OnboardingLayout, Text } from 'shared/components'
+    import { ImportType, ProfileType, setProfileType } from 'shared/lib/profile'
     import { createEventDispatcher } from 'svelte'
-    import { ImportType } from '../Import.svelte'
 
     export let locale
     export let mobile
 
     const dispatch = createEventDispatcher()
 
-    function handleContinueClick(type) {
+    function handleContinueClick(type: ImportType) {
+        const profileType = type === ImportType.Ledger ? ProfileType.Ledger : ProfileType.Software
+        setProfileType(profileType)
         dispatch('next', { type })
     }
     function handleBackClick() {
@@ -37,7 +39,6 @@
                 {locale('views.import.importFile')}
                 <Text type="p" secondary smaller>{locale('views.import.importFileDescription')}</Text>
             </Button>
-            <!-- TODO: ledger, fix button UI -->
             <Button icon="chip" classes="w-full mb-8" secondary onClick={() => handleContinueClick(ImportType.Ledger)}>
                 {locale('views.import.importLedger')}
                 <Text type="p" secondary smaller>{locale('views.import.importLedgerDescription')}</Text>

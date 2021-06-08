@@ -1,6 +1,7 @@
 <script lang="typescript">
     import { SettingsMenu, Text } from 'shared/components'
     import { loggedIn } from 'shared/lib/app'
+    import { isSoftwareProfile } from 'shared/lib/profile'
     import { settingsChildRoute, settingsRoute } from 'shared/lib/router'
     import { SettingsIcons } from 'shared/lib/typings/icons'
     import {
@@ -12,14 +13,14 @@
         SecuritySettings,
         SettingsRoutes,
     } from 'shared/lib/typings/routes'
-    import { profileType, ProfileType } from 'shared/lib/wallet'
 
     export let locale
     export let mobile
 
     const securitySettings = Object.assign({}, SecuritySettings)
+
     // TODO: ledger, The operand of a 'delete' operator cannot be a read-only property
-    if ($profileType !== ProfileType.Software) {
+    $: if (!$isSoftwareProfile) {
         delete securitySettings.ExportStronghold
         delete securitySettings.ChangePassword
     }

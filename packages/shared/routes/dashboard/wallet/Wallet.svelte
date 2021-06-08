@@ -5,7 +5,14 @@
     import { addProfileCurrencyPriceData, priceData } from 'shared/lib/marketData'
     import { showAppNotification } from 'shared/lib/notifications'
     import { openPopup } from 'shared/lib/popup'
-    import { activeProfile, isStrongholdLocked, MigratedTransaction, updateProfile } from 'shared/lib/profile'
+    import {
+        activeProfile,
+        isSoftwareProfile,
+        isStrongholdLocked,
+        MigratedTransaction,
+        setMissingProfileType,
+        updateProfile,
+    } from 'shared/lib/profile'
     import { walletRoute } from 'shared/lib/router'
     import type { Transaction } from 'shared/lib/typings/message'
     import { WalletRoutes } from 'shared/lib/typings/routes'
@@ -28,8 +35,6 @@
         isTransferring,
         prepareAccountInfo,
         processMigratedTransactions,
-        profileType,
-        ProfileType,
         removeEventListeners,
         selectedAccountId,
         setIncomingFlag,
@@ -112,7 +117,13 @@
     setContext<Readable<BalanceHistory>>('walletBalanceHistory', walletBalanceHistory)
 
     let isGeneratingAddress = false
-    let isSoftwareProfile = true
+
+    $: if ($accountsLoaded) {
+        // update profileType if it is missing
+        if (!$activeProfile?.profileType) {
+            setMissingProfileType($accounts)
+        }
+    }
 
     function getAccounts() {
         api.getAccounts({
@@ -141,7 +152,7 @@
                     let newAccounts = []
                     for (const payloadAccount of accountsResponse.payload) {
                         // Only keep messages with a payload
-                        payloadAccount.messages = payloadAccount.messages.filter(m => m.payload)
+                        payloadAccount.messages = payloadAccount.messages.filter((m) => m.payload)
 
                         // The wallet only returns one side of internal transfers
                         // to the same account, so create the other side by first finding
@@ -228,19 +239,20 @@
                 onError(err) {
                     isGeneratingAddress = false
 
-                    const shouldHideErrorNotification = err && err.type === 'ClientError' && err.error === 'error.node.chrysalisNodeInactive'
+                    const shouldHideErrorNotification =
+                        err && err.type === 'ClientError' && err.error === 'error.node.chrysalisNodeInactive'
 
                     if (!shouldHideErrorNotification) {
                         showAppNotification({
-                        type: 'error',
-                        message: locale(err.error),
+                            type: 'error',
+                            message: locale(err.error),
                         })
                     }
                 },
             })
         }
 
-        if (isSoftwareProfile) {
+        if ($isSoftwareProfile) {
             api.getStrongholdStatus({
                 onSuccess(strongholdStatusResponse) {
                     if (strongholdStatusResponse.payload.snapshot.status === 'Locked') {
@@ -395,7 +407,7 @@
             }
         }
 
-        if (isSoftwareProfile) {
+        if ($isSoftwareProfile) {
             api.getStrongholdStatus({
                 onSuccess(strongholdStatusResponse) {
                     if (strongholdStatusResponse.payload.snapshot.status === 'Locked') {
@@ -462,7 +474,7 @@
             )
         }
 
-        if (isSoftwareProfile) {
+        if ($isSoftwareProfile) {
             api.getStrongholdStatus({
                 onSuccess(strongholdStatusResponse) {
                     if (strongholdStatusResponse.payload.snapshot.status === 'Locked') {
@@ -534,7 +546,7 @@
             })
         }
 
-        if (isSoftwareProfile) {
+        if ($isSoftwareProfile) {
             api.getStrongholdStatus({
                 onSuccess(strongholdStatusResponse) {
                     if (strongholdStatusResponse.payload.snapshot.status === 'Locked') {
@@ -565,19 +577,19 @@
 
             initialiseListeners()
 
-            api.getStrongholdStatus({
-                onSuccess(strongholdStatusResponse) {
-                    isStrongholdLocked.set(strongholdStatusResponse.payload.snapshot.status === 'Locked')
-                },
-                onError(error) {
-                    console.error(error)
-                },
-            })
+            if ($isSoftwareProfile) {
+                api.getStrongholdStatus({
+                    onSuccess(strongholdStatusResponse) {
+                        isStrongholdLocked.set(strongholdStatusResponse.payload.snapshot.status === 'Locked')
+                    },
+                    onError(error) {
+                        console.error(error)
+                    },
+                })
+            }
 
             addProfileCurrencyPriceData()
         }
-
-        initialiseListeners()
     })
 
     function checkStrongholdStatus() {
@@ -600,8 +612,6 @@
             },
         })
     }
-
-    $: isSoftwareProfile = $profileType === ProfileType.Software
 </script>
 
 <style type="text/scss">

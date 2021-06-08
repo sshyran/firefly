@@ -4,9 +4,9 @@
     import { diffDates, getBackupWarningColor, isRecentDate } from 'shared/lib/helpers'
     import { showAppNotification } from 'shared/lib/notifications'
     import { openPopup } from 'shared/lib/popup'
-    import { activeProfile, isStrongholdLocked, profiles } from 'shared/lib/profile'
+    import { activeProfile, isSoftwareProfile, isStrongholdLocked, profiles, ProfileType } from 'shared/lib/profile'
     import { LedgerStatus } from 'shared/lib/typings/wallet'
-    import { api, profileType, ProfileType } from 'shared/lib/wallet'
+    import { api } from 'shared/lib/wallet'
     import { onDestroy, onMount } from 'svelte'
     import { get } from 'svelte/store'
 
@@ -16,11 +16,48 @@
     let lastBackupDateFormatted
     let backupSafe
     let color
-    let isDestroyed = false
     let isCheckingLedger
     let ledgerDeviceStatus
     let hardwareDeviceMessage
-    let isSoftwareAccountProfile = true
+    let hardwareDeviceColor = 'gray'
+    let interval
+
+    const unsubscribe = profiles.subscribe(() => {
+        setup()
+    })
+
+    onMount(() => {
+        setup()
+        if (!$isSoftwareProfile) {
+            getLedgerDeviceStatus()
+            interval = setInterval(() => {
+                getLedgerDeviceStatus()
+            }, 10000)
+        }
+    })
+    onDestroy(() => {
+        unsubscribe()
+        if (interval) {
+            clearTimeout(interval)
+        }
+    })
+
+    $: {
+        switch (ledgerDeviceStatus) {
+            case LedgerStatus.Connected:
+                hardwareDeviceMessage = 'detected'
+                hardwareDeviceColor = 'blue'
+                break
+            case LedgerStatus.Disconnected:
+                hardwareDeviceMessage = 'noneDetected'
+                hardwareDeviceColor = 'gray'
+                break
+            case LedgerStatus.Locked:
+                hardwareDeviceMessage = 'locked'
+                hardwareDeviceColor = 'gray'
+                break
+        }
+    }
 
     function setup() {
         const ap = get(activeProfile)
@@ -55,70 +92,29 @@
         })
     }
 
-    function checkLedgerConnection() {
-        return new Promise((resolve, reject) => {
-            // TODO: ledger fix this
-            api.getLedgerDeviceStatus($profileType === 'LedgerNanoSimulator', {
-                onSuccess(response) {
-                    ledgerDeviceStatus = response.payload.type
-                    resolve()
-                },
-                onError(e) {
-                    ledgerDeviceStatus = LedgerStatus.Disconnected
-                    reject(e)
-                },
-            })
+    function getLedgerDeviceStatus() {
+        isCheckingLedger = true
+        api.getLedgerDeviceStatus($activeProfile?.profileType === ProfileType.LedgerSimulator, {
+            onSuccess(response) {
+                ledgerDeviceStatus = response.payload.type
+                setTimeout(function () {
+                    isCheckingLedger = false
+                }, 500)
+            },
+            onError(e) {
+                ledgerDeviceStatus = LedgerStatus.Disconnected
+                setTimeout(function () {
+                    isCheckingLedger = false
+                }, 500)
+            },
         })
     }
-
-    function checkLedger() {
-        isCheckingLedger = true
-        const cb = () => {
-            if (!isDestroyed) {
-                setTimeout(checkLedger, 10000)
-            }
-        }
-        checkLedgerConnection().then(cb).catch(cb)
-    }
-
-    $: {
-        if (!isCheckingLedger && $profileType !== ProfileType.Software) {
-            checkLedger()
-        }
-    }
-
-    $: {
-        switch (ledgerDeviceStatus) {
-            case LedgerStatus.Connected:
-                hardwareDeviceMessage = 'detected'
-                break
-            case LedgerStatus.Disconnected:
-                hardwareDeviceMessage = 'noneDetected'
-                break
-            case LedgerStatus.Locked:
-                hardwareDeviceMessage = 'locked'
-                break
-        }
-    }
-
-    $: isSoftwareAccountProfile = $profileType === ProfileType.Software
-
-    const unsubscribe = profiles.subscribe(() => {
-        setup()
-    })
-
-    onMount(setup)
-    onDestroy(() => {
-        unsubscribe()
-        isDestroyed = true
-    })
 </script>
 
 <div data-label="security" class="pt-6 pb-8 px-8 flex-grow flex flex-col h-full">
     <Text type="h5" classes="mb-5">{locale('general.security')}</Text>
     <div class="grid grid-cols-2 gap-3 auto-rows-max w-full overflow-y-auto flex-auto h-1 -mr-2 pr-2 scroll-secondary">
-        <!-- TODO: ledger, fix UI -->
-        {#if isSoftwareAccountProfile}
+        {#if $isSoftwareProfile}
             <!-- Stronghold backup -->
             <SecurityTile
                 title={locale('views.dashboard.security.strongholdBackup.title')}
@@ -129,16 +125,16 @@
                 icon="shield"
                 warning={!backupSafe}
                 {color} />
-            <!-- Firefly version -->
         {:else}
-            <!-- Hardware Device -->
+            <!-- Ledger profile backup -->
             <SecurityTile
-                onClick={checkLedgerConnection}
-                title={locale('views.dashboard.security.hardwareDevice.title')}
-                message={locale(`views.dashboard.security.hardwareDevice.${hardwareDeviceMessage}`)}
+                title={locale('views.dashboard.security.strongholdBackup.title')}
+                message={''}
+                icon="shield"
                 color="gray"
-                icon="chip" />
+                disabled />
         {/if}
+        <!-- Firefly version -->
         <SecurityTile
             title={locale('views.dashboard.security.version.title', { values: { version: $versionDetails.currentVersion } })}
             message={locale(`views.dashboard.security.version.${$versionDetails.upToDate ? 'upToDate' : 'outOfDate'}`)}
@@ -146,7 +142,7 @@
             warning={!$versionDetails.upToDate}
             icon="firefly"
             onClick={() => handleSecurityTileClick('version')} />
-        {#if isSoftwareAccountProfile}
+        {#if $isSoftwareProfile}
             <!-- Stronghold status -->
             <SecurityTile
                 title={locale('views.dashboard.security.strongholdStatus.title')}
@@ -156,7 +152,21 @@
                 onClick={() => ($isStrongholdLocked ? handleSecurityTileClick('password') : lockStronghold())}
                 classes="col-span-2"
                 toggle
+                wide
                 toggleActive={!$isStrongholdLocked} />
+        {:else}
+            <!-- Hardware Device -->
+            <SecurityTile
+                title={locale('views.dashboard.security.hardwareDevice.title')}
+                message={hardwareDeviceMessage ? locale(`views.dashboard.security.hardwareDevice.${hardwareDeviceMessage}`) : ''}
+                color={hardwareDeviceColor}
+                keepDarkThemeIconColor
+                icon="chip"
+                onClick={getLedgerDeviceStatus}
+                refreshIcon
+                loading={isCheckingLedger}
+                classes="col-span-2"
+                wide />
         {/if}
     </div>
 </div>
