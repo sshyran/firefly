@@ -17,10 +17,10 @@
     const dispatch = createEventDispatcher()
 
     onMount(() => {
-        getLedgerDeviceStatus()
-        interval = setInterval(() => {
-            getLedgerDeviceStatus()
-        }, 1000)
+        // getLedgerDeviceStatus()
+        // interval = setInterval(() => {
+        //     getLedgerDeviceStatus()
+        // }, 1000)
     })
 
     onDestroy(() => {

@@ -19,46 +19,47 @@
     // TODO: dummy
     function generateNewAddress() {
         busy = true
-        newAddress = null
+        newAddress = 'iot1q9f0mlq8yxpx2nck8a0slxnzr4ef2ek8f5gqxlzd0wasgp73utryjtzcp98'
+        busy = false
 
-        api.getAccounts({
-            onSuccess(getAccountsResponse) {
-                // If we have already created an account, just get the first address of the first account
-                if (getAccountsResponse.payload.length > 0) {
-                    newAddress = getAccountsResponse.payload[0].addresses[0].address
-                    busy = false
-                } else {
-                    const officialNodes = getOfficialNodes()
-                    const officialNetwork = getOfficialNetwork()
-                    api.createAccount(
-                        {
-                            clientOptions: {
-                                nodes: officialNodes,
-                                node: officialNodes[Math.floor(Math.random() * officialNodes.length)],
-                                network: officialNetwork,
-                            },
-                            alias: `${locale('general.account')} 1`,
-                            signerType: { type: ledgerSimulator ? 'LedgerNanoSimulator' : 'LedgerNano' },
-                        },
-                        {
-                            onSuccess(createAccountResponse) {
-                                newAddress = createAccountResponse.payload.addresses[0].address
+        // api.getAccounts({
+        //     onSuccess(getAccountsResponse) {
+        //         // If we have already created an account, just get the first address of the first account
+        //         if (getAccountsResponse.payload.length > 0) {
+        //             newAddress = getAccountsResponse.payload[0].addresses[0].address
+        //             busy = false
+        //         } else {
+        //             const officialNodes = getOfficialNodes()
+        //             const officialNetwork = getOfficialNetwork()
+        //             api.createAccount(
+        //                 {
+        //                     clientOptions: {
+        //                         nodes: officialNodes,
+        //                         node: officialNodes[Math.floor(Math.random() * officialNodes.length)],
+        //                         network: officialNetwork,
+        //                     },
+        //                     alias: `${locale('general.account')} 1`,
+        //                     signerType: { type: ledgerSimulator ? 'LedgerNanoSimulator' : 'LedgerNano' },
+        //                 },
+        //                 {
+        //                     onSuccess(createAccountResponse) {
+        //                         newAddress = createAccountResponse.payload.addresses[0].address
 
-                                busy = false
-                            },
-                            onError(error) {
-                                busy = false
-                                console.error(error)
-                            },
-                        }
-                    )
-                }
-            },
-            onError(getAccountsError) {
-                busy = false
-                console.error(getAccountsError)
-            },
-        })
+        //                         busy = false
+        //                     },
+        //                     onError(error) {
+        //                         busy = false
+        //                         console.error(error)
+        //                     },
+        //                 }
+        //             )
+        //         }
+        //     },
+        //     onError(getAccountsError) {
+        //         busy = false
+        //         console.error(getAccountsError)
+        //     },
+        // })
     }
 
     function handleConfirmClick() {

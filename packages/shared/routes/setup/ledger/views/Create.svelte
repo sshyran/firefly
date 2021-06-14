@@ -19,10 +19,10 @@
     const dispatch = createEventDispatcher()
 
     onMount(() => {
-        getLedgerDeviceStatus()
-        interval = setInterval(() => {
-            getLedgerDeviceStatus()
-        }, 1000)
+        // getLedgerDeviceStatus()
+        // interval = setInterval(() => {
+        //     getLedgerDeviceStatus()
+        // }, 1000)
     })
 
     onDestroy(() => {
@@ -66,29 +66,31 @@
 
     function createAccount() {
         creatingAccount = true
-        const officialNodes = getOfficialNodes()
-        const officialNetwork = getOfficialNetwork()
-        api.createAccount(
-            {
-                clientOptions: {
-                    nodes: officialNodes,
-                    node: officialNodes[Math.floor(Math.random() * officialNodes.length)],
-                    network: officialNetwork,
-                },
-                alias: `${locale('general.account')} 1`,
-                signerType: { type: ledgerSimulator ? 'LedgerNanoSimulator' : 'LedgerNano' },
-            },
-            {
-                onSuccess(createAccountResponse) {
-                    creatingAccount = false
-                    dispatch('next')
-                },
-                onError(error) {
-                    creatingAccount = false
-                    console.error(error)
-                },
-            }
-        )
+        // const officialNodes = getOfficialNodes()
+        // const officialNetwork = getOfficialNetwork()
+        // api.createAccount(
+        //     {
+        //         clientOptions: {
+        //             nodes: officialNodes,
+        //             node: officialNodes[Math.floor(Math.random() * officialNodes.length)],
+        //             network: officialNetwork,
+        //         },
+        //         alias: `${locale('general.account')} 1`,
+        //         signerType: { type: ledgerSimulator ? 'LedgerNanoSimulator' : 'LedgerNano' },
+        //     },
+        //     {
+        //         onSuccess(createAccountResponse) {
+        //             creatingAccount = false
+        //             dispatch('next')
+        //         },
+        //         onError(error) {
+        //             creatingAccount = false
+        //             console.error(error)
+        //         },
+        //     }
+        // )
+        creatingAccount = false
+        dispatch('next')
     }
 
     function handleClosePopup() {

@@ -18,10 +18,10 @@
     const dispatch = createEventDispatcher()
 
     onMount(() => {
-        getLedgerDeviceStatus()
-        interval = setInterval(() => {
-            getLedgerDeviceStatus()
-        }, 1000)
+        // getLedgerDeviceStatus()
+        // interval = setInterval(() => {
+        //     getLedgerDeviceStatus()
+        // }, 1000)
     })
 
     onDestroy(() => {
@@ -65,59 +65,63 @@
 
     function restore() {
         restoring = true
-        const officialNodes = getOfficialNodes()
-        const officialNetwork = getOfficialNetwork()
+        let balance = 0
 
-        const _sync = () => {
-            api.syncAccounts({
-                onSuccess(syncAccountsResponse) {
-                    let balance = 0
-                    for (const syncedAccount of syncAccountsResponse.payload) {
-                        const accountBalance = syncedAccount.addresses.reduce((total, address) => total + address.balance, 0)
-                        balance += accountBalance
-                    }
-                    restoring = false
-                    dispatch('next', { balance })
-                },
-                onError(error) {
-                    restoring = false
-                    console.error(error)
-                },
-            })
-        }
+        restoring = false
+        dispatch('next', { balance })
+        // const officialNodes = getOfficialNodes()
+        // const officialNetwork = getOfficialNetwork()
 
-        api.getAccounts({
-            onSuccess(accountsResponse) {
-                if (accountsResponse.payload.length > 0) {
-                    _sync()
-                } else {
-                    api.createAccount(
-                        {
-                            clientOptions: {
-                                nodes: officialNodes,
-                                node: officialNodes[Math.floor(Math.random() * officialNodes.length)],
-                                network: officialNetwork,
-                            },
-                            alias: `${locale('general.account')} 1`,
-                            signerType: { type: ledgerSimulator ? 'LedgerNanoSimulator' : 'LedgerNano' },
-                        },
-                        {
-                            onSuccess(createAccountResponse) {
-                                _sync()
-                            },
-                            onError(error) {
-                                restoring = false
-                                console.error(error)
-                            },
-                        }
-                    )
-                }
-            },
-            onError(errorResponse) {
-                restoring = false
-                console.error(error)
-            },
-        })
+        // const _sync = () => {
+        //     api.syncAccounts({
+        //         onSuccess(syncAccountsResponse) {
+        //             let balance = 0
+        //             for (const syncedAccount of syncAccountsResponse.payload) {
+        //                 const accountBalance = syncedAccount.addresses.reduce((total, address) => total + address.balance, 0)
+        //                 balance += accountBalance
+        //             }
+        //             restoring = false
+        //             dispatch('next', { balance })
+        //         },
+        //         onError(error) {
+        //             restoring = false
+        //             console.error(error)
+        //         },
+        //     })
+        // }
+
+        // api.getAccounts({
+        //     onSuccess(accountsResponse) {
+        //         if (accountsResponse.payload.length > 0) {
+        //             _sync()
+        //         } else {
+        //             api.createAccount(
+        //                 {
+        //                     clientOptions: {
+        //                         nodes: officialNodes,
+        //                         node: officialNodes[Math.floor(Math.random() * officialNodes.length)],
+        //                         network: officialNetwork,
+        //                     },
+        //                     alias: `${locale('general.account')} 1`,
+        //                     signerType: { type: ledgerSimulator ? 'LedgerNanoSimulator' : 'LedgerNano' },
+        //                 },
+        //                 {
+        //                     onSuccess(createAccountResponse) {
+        //                         _sync()
+        //                     },
+        //                     onError(error) {
+        //                         restoring = false
+        //                         console.error(error)
+        //                     },
+        //                 }
+        //             )
+        //         }
+        //     },
+        //     onError(errorResponse) {
+        //         restoring = false
+        //         console.error(error)
+        //     },
+        // })
     }
 
     function handleClosePopup() {
