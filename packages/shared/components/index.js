@@ -52,6 +52,7 @@ export { default as Animation } from './Animation.svelte'
 export { default as ProgressFlow } from './ProgressFlow.svelte'
 export { default as Video } from './Video.svelte'
 export { default as ColorPicker } from './ColorPicker.svelte'
+export { default as PatternPicker } from './PatternPicker.svelte'
 
 export * from './modals'
 // Charts
