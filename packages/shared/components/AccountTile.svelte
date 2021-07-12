@@ -11,6 +11,8 @@
     export let disabled = false
 
     export let onClick = (): void | string => ''
+    export let disabledHover = false
+    export let pattern = ''
 </script>
 
 <style type="text/scss">
@@ -30,14 +32,15 @@
 
 <button
     on:click={onClick}
-    class="size-{size} group rounded-xl bg-gray-100 dark:bg-gray-900 hover:bg-{color}-500 font-400 flex flex-col justify-between text-left p-{size === 's' ? '3' : '6'} {hidden ? 'opacity-50' : ''}"
+    class="size-{size} group rounded-xl {disabledHover ? `bg-${color}-500` : `bg-gray-100 dark:bg-gray-900 hover:bg-${color}-500`} font-400 flex flex-col justify-between text-left p-{size === 's' ? '3' : '6'} {hidden ? 'opacity-50' : ''} bg-no-repeat bg-right-top bg-contain"
+    style={`background-image: url("assets/patterns/${pattern}-gradient.svg")`}
     {disabled}>
     <div class="mb-2 w-full flex flex-row justify-between items-start space-x-1.5">
         <Text
             bold
             smaller={size === 's'}
             overrideColor
-            classes="text-gray-800 dark:text-white group-hover:text-white overflow-hidden overflow-ellipsis">
+            classes="mb-2 {disabledHover ? 'text-white' : 'text-gray-800 dark:text-white group-hover:text-white'} overflow-hidden overflow-ellipsis">
             {name}
         </Text>
         {#if ledger}
@@ -50,7 +53,7 @@
     </div>
     <div
         class="flex {size === 'l' ? 'flex-row space-x-4' : 'flex-col space-y-1'} justify-between w-full flex-{size === 'l' ? 'nowrap' : 'wrap'}">
-        <Text smaller overrideColor classes="block text-gray-800 dark:text-white group-hover:text-white">{balance}</Text>
-        <Text smaller overrideColor classes="block text-blue-500 dark:text-gray-600 group-hover:text-white">{balanceEquiv}</Text>
+        <Text smaller overrideColor classes="block {disabledHover ? 'text-white' : 'text-gray-800 dark:text-white group-hover:text-white'}">{balance}</Text>
+        <Text smaller overrideColor classes="block {disabledHover ? 'text-white' : 'text-blue-500 dark:text-gray-600 group-hover:text-white'}">{balanceEquiv}</Text>
     </div>
 </button>
