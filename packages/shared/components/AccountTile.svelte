@@ -33,7 +33,7 @@
 <button
     on:click={onClick}
     class="size-{size} group rounded-xl {disabledHover ? `bg-${color}-500` : `bg-gray-100 dark:bg-gray-900 hover:bg-${color}-500`} font-400 flex flex-col justify-between text-left p-{size === 's' ? '3' : '6'} {hidden ? 'opacity-50' : ''} bg-no-repeat bg-right-top bg-contain"
-    style={`background-image: url("assets/patterns/${pattern}-gradient.svg")`}
+    style={pattern ? `background-image: url("assets/patterns/${pattern}-gradient.svg")` : null}
     {disabled}>
     <div class="mb-2 w-full flex flex-row justify-between items-start space-x-1.5">
         <Text
