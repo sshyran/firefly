@@ -585,12 +585,6 @@
             }
 
             void addProfileCurrencyPriceData()
-
-            accounts.update(_accounts => _accounts.map(account => {
-                const accountTheme = $accountsTheme.find(e => e.accountId === account.id)
-                const { color, pattern } = accountTheme
-                return { ...account, color, pattern }
-            }))
         }
     })
 </script>
