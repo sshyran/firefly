@@ -5,6 +5,7 @@
     import { deepCopy } from 'shared/lib/helpers'
     import { displayNotificationForLedgerProfile, promptUserToConnectLedger } from 'shared/lib/ledger'
     import { addProfileCurrencyPriceData, priceData } from 'shared/lib/market'
+    import { accountsTheme, setAccountTheme } from 'shared/lib/accountsTheme'
     import { showAppNotification } from 'shared/lib/notifications'
     import { closePopup, openPopup } from 'shared/lib/popup'
     import {
@@ -131,6 +132,17 @@
 
         return [..._migratedTransactions, ...getTransactions($viewableAccounts)]
     })
+
+    $: if ($accounts) {
+        accounts.update(_accounts => _accounts.map(account => {
+            const accountTheme = $accountsTheme.find(e => e.accountId === account.id)
+            if (accountTheme) {
+                const { color, pattern } = accountTheme
+                return { ...account, color, pattern }
+            }
+            return account
+        }))
+    }
 
     setContext<Writable<BalanceOverview>>('walletBalance', balanceOverview)
     setContext<Writable<WalletAccount[]>>('walletAccounts', accounts)
@@ -373,10 +385,10 @@
         }
     }
 
-    async function onCreateAccount(alias, onComplete) {
+    async function onCreateAccount(alias, color = 'blue', pattern = '', onComplete) {
         const _create = async (): Promise<unknown> => {
             try {
-                const account = await asyncCreateAccount(alias)
+                const account = await asyncCreateAccount(alias, color, pattern)
                 await asyncSyncAccountOffline(account)
 
                 walletRoute.set(WalletRoutes.Init)
@@ -573,6 +585,12 @@
             }
 
             void addProfileCurrencyPriceData()
+
+            accounts.update(_accounts => _accounts.map(account => {
+                const accountTheme = $accountsTheme.find(e => e.accountId === account.id)
+                const { color, pattern } = accountTheme
+                return { ...account, color, pattern }
+            }))
         }
     })
 </script>
