@@ -1,18 +1,19 @@
 <script lang="typescript">
     import { Icon, Text } from 'shared/components'
+    import { AccountColors, AccountPatterns } from 'shared/lib/wallet'
 
     export let name = ''
     export let balance = ''
     export let balanceEquiv = ''
-    export let color = 'turquoise'
     export let ledger = false
+    export let color = AccountColors.Default
     export let size = 'm' // m, l
     export let hidden = false
     export let disabled = false
 
     export let onClick = (): void | string => ''
     export let disabledHover = false
-    export let pattern = ''
+    export let pattern = AccountPatterns.Default
 </script>
 
 <style type="text/scss">
