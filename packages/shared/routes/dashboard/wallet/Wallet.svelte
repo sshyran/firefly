@@ -385,7 +385,7 @@
         }
     }
 
-    async function onCreateAccount(alias, color = 'blue', pattern = '', onComplete) {
+    async function onCreateAccount(alias, color, pattern, onComplete) {
         const _create = async (): Promise<unknown> => {
             try {
                 const account = await asyncCreateAccount(alias, color, pattern)
