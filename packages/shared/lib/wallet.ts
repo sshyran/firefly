@@ -75,6 +75,7 @@ export enum AccountPatterns {
     Default = '',
     Clover = 'clover',
     Circles = 'circles',
+    Clouds = 'clouds',
     Shapes = 'shapes',
     Wind = 'wind',
     Rain = 'rain',
