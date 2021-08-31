@@ -1,7 +1,7 @@
 <script lang="typescript">
     import { AccountActionsModal, DashboardPane } from 'shared/components'
-    import type { AccountMessage, WalletAccount, AccountColors } from 'shared/lib/wallet'
-    import { activeProfile } from 'shared/lib/profile'
+    import type { AccountMessage, WalletAccount } from 'shared/lib/wallet'
+    import { activeProfile, getColor } from 'shared/lib/profile'
     import { getContext } from 'svelte'
     import type { Readable } from 'svelte/store'
     import { AccountActions, AccountBalance, AccountHistory, AccountNavigation, BarChart, LineChart } from '.'
@@ -31,8 +31,6 @@
     const handleMenuClick = () => {
         showActionsModal = !showActionsModal
     }
-
-    const getColor = (account) => $activeProfile.accounts?.find(_account => account.id)?.color || AccountColors.Default
 </script>
 
 <!-- wait for account to load -->
@@ -44,7 +42,7 @@
                 <DashboardPane classes=" h-full flex flex-auto flex-col flex-shrink-0">
                     <AccountBalance
                         {locale}
-                        color={getColor($account)}
+                        color={getColor($activeProfile, $account.id)}
                         balance={$account.balance}
                         balanceEquiv={$account.balanceEquiv}
                         onMenuClick={handleMenuClick} />

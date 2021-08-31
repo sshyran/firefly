@@ -1,6 +1,7 @@
 import type { AvailableExchangeRates } from './currency'
 import type { ChartSelectors } from './chart'
 import type { NetworkConfig } from './network'
+import { ProfileAccount } from 'lib/profile'
 
 export interface MigratedTransaction {
     address: string
@@ -30,6 +31,7 @@ export interface Profile {
     isDeveloperProfile: boolean
     hasVisitedDashboard?: boolean
     ledgerMigrationCount?: number
+    accounts: ProfileAccount[]
 }
 
 /**

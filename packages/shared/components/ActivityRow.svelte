@@ -12,6 +12,7 @@
         getMilestoneMessageValue,
         receiverAddressesFromTransactionPayload,
         sendAddressFromTransactionPayload,
+        AccountColors,
     } from 'shared/lib/wallet'
     import { getContext } from 'svelte'
     import type { Writable } from 'svelte/store'
@@ -86,7 +87,7 @@
                 if (includeFullSender) {
                     accountAlias = acc.alias
                 }
-                initialsColor = acc.color
+                initialsColor = AccountColors.Default
             } else {
                 // We can't find the address in our accounts so just display the abbreviated address
                 if (includeFullSender) {
