@@ -1,23 +1,22 @@
-import { persistent } from 'shared/lib/helpers'
+import { Profile, activeProfile, updateProfile, ProfileAccount } from 'shared/lib/profile'
 
 /**
- * AccountTheme interface
+ * Sets account element color and pattern for accounts key inside profiles object
+ *
+ * @method setAccountTheme
+ *
+ * @returns {void}
  */
-export interface AccountTheme {
-    accountId: string
-    color: string
-    pattern: string
-}
+export const setAccountTheme = (activeProfile: Profile, profileAccount: ProfileAccount): void => {
+    const { accounts } = activeProfile
+    const { id, color, pattern } = profileAccount
 
-export const accountsTheme = persistent<AccountTheme[]>('accountsTheme', [])
-
-export const setAccountTheme = (accountId: string, color: string, pattern: string) => {
-    const accountTheme = { accountId, color, pattern }
-
-    accountsTheme.update(_accountsTheme => {
-        if (_accountsTheme.find(e => e.accountId === accountId)) {
-            return _accountsTheme.map(e => e.accountId === accountId ? accountTheme : e)
+    const updatedAccounts = () => {
+        if (accounts?.length) {
+            return accounts.map(account => account.id === id ? { ...account, color, pattern } : account)
         }
-        return [..._accountsTheme, accountTheme]
-    })
+        return [profileAccount]
+    }
+
+    updateProfile('accounts', updatedAccounts())
 }
