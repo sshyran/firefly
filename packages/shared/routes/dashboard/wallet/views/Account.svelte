@@ -6,7 +6,6 @@
     import type { Readable } from 'svelte/store'
     import { AccountActions, AccountBalance, AccountHistory, AccountNavigation, BarChart, LineChart } from '.'
     import { Locale } from 'shared/lib/typings/i18n'
-    import { AccountMessage, WalletAccount } from 'shared/lib/typings/wallet'
 
     export let locale: Locale
 

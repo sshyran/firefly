@@ -1,7 +1,14 @@
 import { persistent } from 'shared/lib/helpers'
 import { ledgerSimulator } from 'shared/lib/ledger'
 import { generateRandomId, migrateObjects } from 'shared/lib/utils'
-import { asyncRemoveStorage, destroyActor, getStoragePath, getWalletStoragePath, AccountColors, AccountPatterns} from 'shared/lib/wallet'
+import {
+    asyncRemoveStorage,
+    destroyActor,
+    getStoragePath,
+    getWalletStoragePath,
+    AccountColors,
+    AccountPatterns,
+} from 'shared/lib/wallet'
 import { derived, get, Readable, writable } from 'svelte/store'
 import { Electron } from './electron'
 import type { ValuesOf } from './typings/utils'
@@ -96,7 +103,7 @@ const buildProfile = (profileName: string, isDeveloperProfile: boolean): Profile
         },
     },
     ledgerMigrationCount: 0,
-    accounts: []
+    accounts: [],
 })
 
 /**
@@ -359,12 +366,16 @@ export const hasNoProfiles = (): boolean => get(profiles).length === 0
  *
  * @returns {ProfileAccount[]}
  */
- const getUpdatedAccounts = (activeProfile: Profile, accountId: string, profileAccount: ProfileAccount): ProfileAccount[] => {
+const getUpdatedAccounts = (
+    activeProfile: Profile,
+    accountId: string,
+    profileAccount: ProfileAccount
+): ProfileAccount[] => {
     const { accounts } = activeProfile
 
     if (accounts?.length) {
-        if (accounts?.find(account => account.id === accountId)) {
-            return accounts.map(account => account.id === accountId ? profileAccount : account)
+        if (accounts?.find((account) => account.id === accountId)) {
+            return accounts.map((account) => (account.id === accountId ? profileAccount : account))
         } else {
             return [...accounts, profileAccount]
         }
@@ -395,7 +406,7 @@ export const getColor = (activeProfile: Profile, accountId: string): string => {
     const { accounts } = activeProfile
 
     if (accounts?.length) {
-        return accounts.find(account => account.id === accountId)?.color || AccountColors.Default
+        return accounts.find((account) => account.id === accountId)?.color || AccountColors.Default
     }
     return AccountColors.Default
 }
@@ -411,7 +422,7 @@ export const getPattern = (activeProfile: Profile, accountId: string): string =>
     const { accounts } = activeProfile
 
     if (accounts?.length) {
-        return accounts.find(account => account.id === accountId)?.pattern || AccountPatterns.Default
+        return accounts.find((account) => account.id === accountId)?.pattern || AccountPatterns.Default
     }
     return AccountPatterns.Default
 }
