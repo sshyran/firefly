@@ -59,6 +59,7 @@
     import { onMount, setContext } from 'svelte'
     import { derived, Readable, Writable } from 'svelte/store'
     import { Account, CreateAccount, LineChart, Security, WalletActions, WalletBalance, WalletHistory } from './views/'
+    import { setProfileAccount } from 'shared/lib/profile'
 
     export let locale: Locale
 
@@ -384,6 +385,7 @@
                 await asyncSyncAccountOffline(account)
 
                 walletRoute.set(WalletRoutes.Init)
+                setProfileAccount($activeProfile, { id: $selectedAccountId, color, pattern })
 
                 onComplete()
             } catch (err) {
