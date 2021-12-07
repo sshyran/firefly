@@ -1,12 +1,12 @@
 <script lang="typescript">
     import { Icon, Text } from 'shared/components'
-    import { AccountColors, AccountPatterns } from 'shared/lib/wallet'
+    import { AccountPatterns } from 'shared/lib/wallet'
 
     export let name = ''
     export let balance = ''
     export let balanceEquiv = ''
     export let ledger = false
-    export let color = AccountColors.Default
+    export let color = ''
     export let size = 'm' // m, l
     export let hidden = false
     export let disabled = false
@@ -14,6 +14,8 @@
     export let onClick = (): void | string => ''
     export let disabledHover = false
     export let pattern = AccountPatterns.Default
+
+    $: textColor = color.match(/([0-9]{3})+/g)?.some(c => parseInt(c, 10) >= 160) ? 'black' : 'white'
 </script>
 
 <style type="text/scss">
@@ -28,13 +30,21 @@
             @apply pointer-events-none;
             @apply opacity-50;
         }
+
+        &.disabled-hover {
+            background-color: rgb(var(--account-color));
+        }
+
+        &:not(.disabled-hover):hover {
+            background-color: rgb(var(--account-color));
+        }
     }
 </style>
 
 <button
     on:click={onClick}
-    class="size-{size} group rounded-xl {disabledHover ? `bg-${color}-500` : `bg-gray-100 dark:bg-gray-900 hover:bg-${color}-500`} font-400 flex flex-col justify-between text-left p-{size === 's' ? '3' : '6'} {hidden ? 'opacity-50' : ''} bg-no-repeat bg-right-top bg-contain"
-    style={pattern ? `background-image: url("assets/patterns/${pattern}-gradient.svg")` : null}
+    class="size-{size} group rounded-xl {disabledHover ? 'disabled-hover' : 'bg-gray-100 dark:bg-gray-900'} font-400 flex flex-col justify-between text-left p-{size === 's' ? '3' : '6'} {hidden ? 'opacity-50' : ''} bg-no-repeat bg-right-top bg-contain"
+    style="--account-color: {color}; color: {textColor}; {pattern ? `background-image: url("assets/patterns/${pattern}-gradient.svg")` : null}"
     {disabled}>
     <div class="mb-2 w-full flex flex-row justify-between items-start space-x-1.5">
         <Text
