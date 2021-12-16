@@ -5,6 +5,7 @@
     import { tick } from 'svelte'
 
     export let color = 'blue' // TODO: profiles will have different colors
+    export let textColor = 'white'
 
     export let balanceRaw
     export let balanceFiat
@@ -44,11 +45,11 @@
         on:mouseenter={toggleTooltip}
         on:mouseleave={toggleTooltip}
         on:click={togglePreciseBalance}>
-        <Text type="h2" overrideColor classes="text-white">
+        <Text type="h2" overrideColor classes="text-{textColor}">
             {showPreciseBalance ? formatUnitPrecision(balanceRaw, Unit.Mi) : formatUnitBestMatch(balanceRaw, true, 3)}
         </Text>
     </balance-box>
-    <Text type="p" overrideColor smaller classes="text-{color}-200 dark:text-blue-300">{balanceFiat}</Text>
+    <Text type="p" overrideColor smaller classes="text-{textColor} dark:text-{textColor}">{balanceFiat}</Text>
     {#if showTooltip}
         <Tooltip {parentTop} {parentLeft} {parentWidth}>
             <Text type="p">

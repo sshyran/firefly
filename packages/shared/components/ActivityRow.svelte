@@ -1,6 +1,6 @@
 <script lang="typescript">
     import { Icon, Text } from 'shared/components'
-    import { truncateString } from 'shared/lib/helpers'
+    import { truncateString, isBright } from 'shared/lib/helpers'
     import { formatDate } from 'shared/lib/i18n'
     import type { Milestone, Payload, Transaction } from 'shared/lib/typings/message'
     import { formatUnitBestMatch } from 'shared/lib/units'
@@ -18,6 +18,7 @@
     import type { Writable } from 'svelte/store'
     import { Locale } from 'shared/lib/typings/i18n'
     import { WalletAccount } from 'shared/lib/typings/wallet'
+    import { activeProfile, getColor } from 'shared/lib/profile'
 
     export let locale: Locale
 
@@ -87,7 +88,7 @@
                 if (includeFullSender) {
                     accountAlias = acc.alias
                 }
-                initialsColor = AccountColors.Default
+                initialsColor = getColor($activeProfile, acc.id)
             } else {
                 // We can't find the address in our accounts so just display the abbreviated address
                 if (includeFullSender) {
@@ -125,19 +126,28 @@
     }
 </script>
 
+<style>
+    .account-color {
+        background-color: var(--account-color);
+    }
+</style>
+
 <button
     on:click={onClick}
     data-label="transaction-row"
     class="w-full text-left flex rounded-2xl items-center bg-gray-100 dark:bg-gray-900 dark:bg-opacity-50 p-4 {(!confirmed || hasCachedMigrationTx) && 'opacity-50'} {hasCachedMigrationTx && 'pointer-events-none'} overflow-hidden"
-    disabled={hasCachedMigrationTx}>
+    disabled={hasCachedMigrationTx}
+    style="--account-color: {color}">
     <div class="w-8">
         {#if hasCachedMigrationTx || milestonePayload}
             <Icon boxed classes="text-white" boxClasses="bg-gray-500 dark:bg-gray-900" icon="double-chevron-right" />
         {:else}
             <Icon
                 boxed
-                classes={`text-white dark:text-${initialsColor}-600`}
-                boxClasses="bg-{initialsColor ? `${initialsColor}-500` : txPayload.data.essence.data.internal ? 'gray-500' : `${color}-${txPayload.data.essence.data.internal ? '500' : '600'}`} dark:bg-gray-900"
+                classes={`text-${isBright(initialsColor) ? 'gray-800' : 'white'}`}
+                boxClasses="dark:bg-gray-900"
+                fill={isBright(initialsColor) ? '#000000' : ''}
+                boxStyles={`background-color: ${initialsColor || (txPayload.data.essence.data.internal && 'gray')};`}
                 icon={txPayload.data.essence.data.internal ? 'transfer' : txPayload.data.essence.data.incoming ? 'chevron-down' : 'chevron-up'} />
         {/if}
     </div>
