@@ -71,7 +71,7 @@
             deepLinkRequestActive.set(false)
         }
     }
-    const color = AccountColors.Default
+    const color = AccountColors.Blue
     const pattern = AccountPatterns.Default
 
     const accountsBalanceHistory = derived([accounts, priceData], ([$accounts, $priceData]) =>

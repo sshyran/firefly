@@ -127,17 +127,13 @@
 </script>
 
 <style>
-    .account-color {
-        background-color: var(--account-color);
-    }
 </style>
 
 <button
     on:click={onClick}
     data-label="transaction-row"
     class="w-full text-left flex rounded-2xl items-center bg-gray-100 dark:bg-gray-900 dark:bg-opacity-50 p-4 {(!confirmed || hasCachedMigrationTx) && 'opacity-50'} {hasCachedMigrationTx && 'pointer-events-none'} overflow-hidden"
-    disabled={hasCachedMigrationTx}
-    style="--account-color: {color}">
+    disabled={hasCachedMigrationTx}>
     <div class="w-8">
         {#if hasCachedMigrationTx || milestonePayload}
             <Icon boxed classes="text-white" boxClasses="bg-gray-500 dark:bg-gray-900" icon="double-chevron-right" />
