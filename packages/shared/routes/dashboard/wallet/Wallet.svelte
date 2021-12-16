@@ -53,13 +53,10 @@
         transferState,
         updateBalanceOverview,
         wallet,
-        AccountColors,
-        AccountPatterns,
     } from 'shared/lib/wallet'
     import { onMount, setContext } from 'svelte'
     import { derived, Readable, Writable } from 'svelte/store'
     import { Account, CreateAccount, LineChart, Security, WalletActions, WalletBalance, WalletHistory } from './views/'
-    import { setProfileAccount } from 'shared/lib/profile'
 
     export let locale: Locale
 
@@ -71,9 +68,6 @@
             deepLinkRequestActive.set(false)
         }
     }
-    const color = AccountColors.Blue
-    const pattern = AccountPatterns.Default
-
     const accountsBalanceHistory = derived([accounts, priceData], ([$accounts, $priceData]) =>
         getAccountsBalanceHistory($accounts, $priceData)
     )
@@ -378,14 +372,13 @@
         }
     }
 
-    async function onCreateAccount(alias, onComplete) {
+    async function onCreateAccount(alias, color, pattern, onComplete) {
         const _create = async (): Promise<unknown> => {
             try {
-                const account = await asyncCreateAccount(alias)
+                const account = await asyncCreateAccount(alias, color, pattern)
                 await asyncSyncAccountOffline(account)
 
                 walletRoute.set(WalletRoutes.Init)
-                setProfileAccount($activeProfile, { id: $selectedAccountId, color, pattern })
 
                 onComplete()
             } catch (err) {

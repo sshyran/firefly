@@ -403,7 +403,7 @@ export const setProfileAccount = (activeProfile: Profile, profileAccount: Profil
  * @returns {string}
  */
 export const getColor = (activeProfile: Profile, accountId: string): string | AccountColors => {
-    const { accounts } = activeProfile
+    const { accounts } = activeProfile || {}
 
     if (accounts?.length) {
         return accounts.find((account) => account.id === accountId)?.color || AccountColors.Blue
