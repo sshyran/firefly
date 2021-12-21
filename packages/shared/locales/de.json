@@ -487,7 +487,7 @@
         },
         "staking": {
             "title": "Staking",
-            "welcome": "Willkommen im Staking-Dashboard",
+            "welcome": "Welcome to the staking dashboard!",
             "status": {
                 "upcoming": "Event hat noch nicht begonnen",
                 "commencing": "Pre-Staking möglich",
@@ -863,7 +863,7 @@
         "howItWorks": "Wie es funktioniert",
         "learnAboutStaking": "Erfahre mehr über Staking",
         "stake": "Staken",
-        "unstake": "Beenden",
+        "unstake": "Staking aufheben",
         "stakeFunds": "Guthaben staken",
         "manageStake": "Staking verwalten",
         "merge": "Staken",

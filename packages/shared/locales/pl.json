@@ -487,10 +487,10 @@
         },
         "staking": {
             "title": "Staking",
-            "welcome": "Witaj w panelu stakingu",
+            "welcome": "Welcome to the staking dashboard!",
             "status": {
                 "upcoming": "Wydarzenie nie zostało rozpoczęte",
-                "commencing": "Pre-staking możliwy",
+                "commencing": "Pre-staking dostępny",
                 "holdingActive": "Staking w toku",
                 "holdingInactive": "Staking możliwy",
                 "inactive": "Nie wykryto stakingu",
@@ -515,7 +515,7 @@
             },
             "airdrops": {
                 "holding": "Pozostało",
-                "commencing": "Do momentu rozpoczęcia stakingu",
+                "commencing": "Do rozpoczęcia stakingu",
                 "collectedRewards": "Otrzymane nagrody",
                 "assembly": {
                     "name": "Assembly",
@@ -641,7 +641,7 @@
         },
         "balanceFinder": {
             "title": "Wyszukiwarka środków",
-            "body": "Wykonaj bardziej dogłębne wyszukiwanie adresów w celu znalezienia brakujących środków. To może chwilę potrwać.",
+            "body": "Wykonaj bardziej dogłębne przeszukanie adresów pod kątem brakujących środków. To może chwilę potrwać.",
             "totalWalletBalance": "Wszystkie środki",
             "typePassword": "Wpisz hasło, aby umożliwić wyszukiwanie."
         },
@@ -719,7 +719,7 @@
         "stakingNotice": {
             "upcomingDate": "Staking jeszcze się nie rozpoczął",
             "commencingDate": "Staking jeszcze się nie rozpoczął",
-            "body": "Dzięki pre-stakowaniu swoich środków, automatycznie zaczniesz otrzymywać nagrody w momencie rozpoczęcia właściwego wydarzenia stakingu.",
+            "body": "Dzięki pre-stakowaniu swoich środków, automatycznie zaczniesz otrzymywać nagrody w momencie rozpoczęcia stakingu.",
             "ok": "Ok, rozumiem"
         },
         "stakingManager": {
@@ -861,7 +861,7 @@
         "migrateAgain": "Migruj kolejny indeks",
         "visitWebsite": "Odwiedź stronę",
         "howItWorks": "Jak to działa",
-        "learnAboutStaking": "Czym jest staking?",
+        "learnAboutStaking": "Dowiedz się więcej o stakingu",
         "stake": "Stakuj",
         "unstake": "Odstakuj",
         "stakeFunds": "Stakuj środki",
@@ -1200,7 +1200,7 @@
             },
             "commencing": {
                 "title": "Pre-staking jest już dostępny",
-                "body": "Pre-stakuj swoje tokeny, a gdy staking wystartuje, automatycznie zaczniesz otrzymywać nagrody co 10 sekund."
+                "body": "Pre-stakuj swoje tokeny, a w chwili rozpoczęcia stakingu, automatycznie zaczniesz otrzymywać nagrody co 10 sekund."
             },
             "activeHolding": {
                 "title": "Staking jest w toku",

@@ -487,7 +487,7 @@
         },
         "staking": {
             "title": "Ставка",
-            "welcome": "Ласкаво просимо до інформаційної панелі ставок",
+            "welcome": "Welcome to the staking dashboard!",
             "status": {
                 "upcoming": "Подія не почалася",
                 "commencing": "Попередня ставка відкрита",

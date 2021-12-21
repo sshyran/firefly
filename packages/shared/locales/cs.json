@@ -487,7 +487,7 @@
         },
         "staking": {
             "title": "Stakování",
-            "welcome": "Vítejte na nástěnce stakingu",
+            "welcome": "Welcome to the staking dashboard!",
             "status": {
                 "upcoming": "Událost nebyla spuštěna",
                 "commencing": "Před-stakování otevřeno",

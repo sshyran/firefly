@@ -487,7 +487,7 @@
         },
         "staking": {
             "title": "Staken",
-            "welcome": "Welkom op het staking dashboard",
+            "welcome": "Welcome to the staking dashboard!",
             "status": {
                 "upcoming": "Evenement nog niet begonnen",
                 "commencing": "Pre-staking geopend",

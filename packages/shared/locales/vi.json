@@ -487,7 +487,7 @@
         },
         "staking": {
             "title": "Đặt cọc",
-            "welcome": "Chào mừng tới bản điều khiển đặt cọc\n",
+            "welcome": "Welcome to the staking dashboard!",
             "status": {
                 "upcoming": "Sự kiện chưa diễn ra",
                 "commencing": "Mở đặt cọc trước",

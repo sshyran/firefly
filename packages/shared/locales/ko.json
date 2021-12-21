@@ -487,7 +487,7 @@
         },
         "staking": {
             "title": "스테이킹",
-            "welcome": "환영합니다. 스테이킹 대시보드입니다.",
+            "welcome": "Welcome to the staking dashboard!",
             "status": {
                 "upcoming": "이벤트 실행 전",
                 "commencing": "Pre-staking 시작",

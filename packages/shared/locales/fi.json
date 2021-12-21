@@ -487,7 +487,7 @@
         },
         "staking": {
             "title": "Staking",
-            "welcome": "Tervetuloa staking-käyttöliittymään",
+            "welcome": "Welcome to the staking dashboard!",
             "status": {
                 "upcoming": "Tapahtuma ei ole alkanut",
                 "commencing": "Pre-staking avoinna",

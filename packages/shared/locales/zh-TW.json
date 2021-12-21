@@ -19,7 +19,7 @@
             "body1": "您可以創建多個使用者設定檔來整理您的錢包並加強隱私。",
             "body2": {
                 "first": "現在，讓我們從您的第一個設定檔名稱開始。",
-                "nonFirst": "現在，讓我們從您的設定檔名稱開始。"
+                "nonFirst": "現在，讓我們從您的個人設定檔的名稱開始。"
             },
             "addMore": "您稍後可以添加更多設定檔。",
             "developer": {
@@ -109,7 +109,7 @@
             "title": "備份至一個 Stronghold 檔案",
             "body1": "輸入密碼以將您的錢包備份至 Stronghold 檔案。您的密碼將用於加密此備份檔案。",
             "body2": "數位備份之所以重要的原因：",
-            "reason1": "無需輸入助記詞即可輕鬆恢復錢包",
+            "reason1": "無需輸入助記詞即可輕鬆還原錢包",
             "reason2": "將您的錢包導入其他設備",
             "reason3": "恢復您的完整交易記錄"
         },
@@ -487,7 +487,7 @@
         },
         "staking": {
             "title": "質押",
-            "welcome": "歡迎來到質押儀錶板",
+            "welcome": "Welcome to the staking dashboard!",
             "status": {
                 "upcoming": "活動尚未開始",
                 "commencing": "預先質押已開放",
@@ -1040,7 +1040,7 @@
         "fundsAvailableSoon": "您的資金很快就可以使用",
         "exportTransactionHistory": {
             "success": "{accountAlias} 的交易紀錄已順利儲存到 {filePath}",
-            "error": "無法匯出帳戶 {accountAlias} 的交易記錄"
+            "error": "無法匯出 {accountAlias} 的交易記錄"
         },
         "deepLinkingRequest": {
             "recievedWhileLoggedOut": "請登入以發起 IOTA 連結",
@@ -1173,7 +1173,7 @@
             "cannotUseAccount": "無法使用該指定帳戶。",
             "cannotFindStakingEvent": "未能找到質押活動。",
             "cannotVisitAirdropWebsite": "無法開啟 {airdrop} 網站。",
-            "invalidStakingEventId": "質押活動ID無效。"
+            "invalidStakingEventId": "無效的質押活動ID。"
         }
     },
     "warning": {

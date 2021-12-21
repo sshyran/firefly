@@ -310,16 +310,16 @@
                 "description": ""
             },
             "theme": {
-                "title": "テーマ",
+                "title": "テーマ：",
                 "description": "",
                 "advice": "Fireflyアプリケーションを再起動して、システムテーマの変更を有効にします"
             },
             "language": {
-                "title": "言語",
+                "title": "言語:",
                 "description": ""
             },
             "currency": {
-                "title": "通貨",
+                "title": "通貨：",
                 "description": "残高変換を調整し、チャートオプションを更新します"
             },
             "notifications": {
@@ -487,7 +487,7 @@
         },
         "staking": {
             "title": "ステーキング",
-            "welcome": "ステーキングダッシュボードへようこそ",
+            "welcome": "Welcome to the staking dashboard!",
             "status": {
                 "upcoming": "イベントは開始されていません",
                 "commencing": "事前ステーキングオープン",

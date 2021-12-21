@@ -487,7 +487,7 @@
         },
         "staking": {
             "title": "Залагане",
-            "welcome": "Добре дошли в таблото за стейкване",
+            "welcome": "Welcome to the staking dashboard!",
             "status": {
                 "upcoming": "Събитието не е започнало",
                 "commencing": "Предстейкването е отворено",
